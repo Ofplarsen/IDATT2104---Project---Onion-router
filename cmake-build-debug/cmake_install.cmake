@@ -1,4 +1,4 @@
-# Install script for directory: C:/Dataingenior/Semester_4/Nettvreksprogrammering/programmeringsprosjekt2/IDATT2104---Project---Onion-router
+# Install script for directory: C:/Users/xray2/OneDrive/Documents/NTNU/DataIng2023/Vaar2022/Nettverksprogrammering/Project/IDATT2104---Project---Onion-router
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Dataingenior/Semester_4/Nettvreksprogrammering/programmeringsprosjekt2/IDATT2104---Project---Onion-router/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/xray2/OneDrive/Documents/NTNU/DataIng2023/Vaar2022/Nettverksprogrammering/Project/IDATT2104---Project---Onion-router/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

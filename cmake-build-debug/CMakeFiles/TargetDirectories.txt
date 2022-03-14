@@ -1,3 +1,3 @@
-C:/Dataingenior/Semester_4/Nettvreksprogrammering/programmeringsprosjekt2/IDATT2104---Project---Onion-router/cmake-build-debug/CMakeFiles/IDATT2104___Project___Onion_router.dir
-C:/Dataingenior/Semester_4/Nettvreksprogrammering/programmeringsprosjekt2/IDATT2104---Project---Onion-router/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Dataingenior/Semester_4/Nettvreksprogrammering/programmeringsprosjekt2/IDATT2104---Project---Onion-router/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/xray2/OneDrive/Documents/NTNU/DataIng2023/Vaar2022/Nettverksprogrammering/Project/IDATT2104---Project---Onion-router/cmake-build-debug/CMakeFiles/IDATT2104___Project___Onion_router.dir
+C:/Users/xray2/OneDrive/Documents/NTNU/DataIng2023/Vaar2022/Nettverksprogrammering/Project/IDATT2104---Project---Onion-router/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/xray2/OneDrive/Documents/NTNU/DataIng2023/Vaar2022/Nettverksprogrammering/Project/IDATT2104---Project---Onion-router/cmake-build-debug/CMakeFiles/rebuild_cache.dir

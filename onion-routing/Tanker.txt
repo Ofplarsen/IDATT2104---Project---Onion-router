@@ -1,0 +1,13 @@
+Noder:
+    - Sockets for å snakke mellom hverandre
+    - https://www.geeksforgeeks.org/socket-programming-cc/
+    - Hvilken kryptering? hash/ssh/osv
+    - Enden må være websocket? (HTTP/HTTPS tenker siste)
+    - Input må være koblet til klient
+Client:
+    -
+
+
+Routing:
+    - https://www.geeksforgeeks.org/onion-routing/
+    -
