@@ -152,6 +152,126 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+onion-routing/client/Client.obj: onion-routing/client/Client.cpp.obj
+.PHONY : onion-routing/client/Client.obj
+
+# target to build an object file
+onion-routing/client/Client.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/client/Client.cpp.obj
+.PHONY : onion-routing/client/Client.cpp.obj
+
+onion-routing/client/Client.i: onion-routing/client/Client.cpp.i
+.PHONY : onion-routing/client/Client.i
+
+# target to preprocess a source file
+onion-routing/client/Client.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/client/Client.cpp.i
+.PHONY : onion-routing/client/Client.cpp.i
+
+onion-routing/client/Client.s: onion-routing/client/Client.cpp.s
+.PHONY : onion-routing/client/Client.s
+
+# target to generate assembly for a file
+onion-routing/client/Client.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/client/Client.cpp.s
+.PHONY : onion-routing/client/Client.cpp.s
+
+onion-routing/key/Key.obj: onion-routing/key/Key.cpp.obj
+.PHONY : onion-routing/key/Key.obj
+
+# target to build an object file
+onion-routing/key/Key.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/key/Key.cpp.obj
+.PHONY : onion-routing/key/Key.cpp.obj
+
+onion-routing/key/Key.i: onion-routing/key/Key.cpp.i
+.PHONY : onion-routing/key/Key.i
+
+# target to preprocess a source file
+onion-routing/key/Key.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/key/Key.cpp.i
+.PHONY : onion-routing/key/Key.cpp.i
+
+onion-routing/key/Key.s: onion-routing/key/Key.cpp.s
+.PHONY : onion-routing/key/Key.s
+
+# target to generate assembly for a file
+onion-routing/key/Key.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/key/Key.cpp.s
+.PHONY : onion-routing/key/Key.cpp.s
+
+onion-routing/node/ExitNode.obj: onion-routing/node/ExitNode.cpp.obj
+.PHONY : onion-routing/node/ExitNode.obj
+
+# target to build an object file
+onion-routing/node/ExitNode.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/node/ExitNode.cpp.obj
+.PHONY : onion-routing/node/ExitNode.cpp.obj
+
+onion-routing/node/ExitNode.i: onion-routing/node/ExitNode.cpp.i
+.PHONY : onion-routing/node/ExitNode.i
+
+# target to preprocess a source file
+onion-routing/node/ExitNode.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/node/ExitNode.cpp.i
+.PHONY : onion-routing/node/ExitNode.cpp.i
+
+onion-routing/node/ExitNode.s: onion-routing/node/ExitNode.cpp.s
+.PHONY : onion-routing/node/ExitNode.s
+
+# target to generate assembly for a file
+onion-routing/node/ExitNode.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/node/ExitNode.cpp.s
+.PHONY : onion-routing/node/ExitNode.cpp.s
+
+onion-routing/node/InputNode.obj: onion-routing/node/InputNode.cpp.obj
+.PHONY : onion-routing/node/InputNode.obj
+
+# target to build an object file
+onion-routing/node/InputNode.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/node/InputNode.cpp.obj
+.PHONY : onion-routing/node/InputNode.cpp.obj
+
+onion-routing/node/InputNode.i: onion-routing/node/InputNode.cpp.i
+.PHONY : onion-routing/node/InputNode.i
+
+# target to preprocess a source file
+onion-routing/node/InputNode.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/node/InputNode.cpp.i
+.PHONY : onion-routing/node/InputNode.cpp.i
+
+onion-routing/node/InputNode.s: onion-routing/node/InputNode.cpp.s
+.PHONY : onion-routing/node/InputNode.s
+
+# target to generate assembly for a file
+onion-routing/node/InputNode.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/node/InputNode.cpp.s
+.PHONY : onion-routing/node/InputNode.cpp.s
+
+onion-routing/node/Node.obj: onion-routing/node/Node.cpp.obj
+.PHONY : onion-routing/node/Node.obj
+
+# target to build an object file
+onion-routing/node/Node.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/node/Node.cpp.obj
+.PHONY : onion-routing/node/Node.cpp.obj
+
+onion-routing/node/Node.i: onion-routing/node/Node.cpp.i
+.PHONY : onion-routing/node/Node.i
+
+# target to preprocess a source file
+onion-routing/node/Node.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/node/Node.cpp.i
+.PHONY : onion-routing/node/Node.cpp.i
+
+onion-routing/node/Node.s: onion-routing/node/Node.cpp.s
+.PHONY : onion-routing/node/Node.s
+
+# target to generate assembly for a file
+onion-routing/node/Node.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\IDATT2104___Project___Onion_router.dir\build.make CMakeFiles/IDATT2104___Project___Onion_router.dir/onion-routing/node/Node.cpp.s
+.PHONY : onion-routing/node/Node.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -164,6 +284,21 @@ help:
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
+	@echo ... onion-routing/client/Client.obj
+	@echo ... onion-routing/client/Client.i
+	@echo ... onion-routing/client/Client.s
+	@echo ... onion-routing/key/Key.obj
+	@echo ... onion-routing/key/Key.i
+	@echo ... onion-routing/key/Key.s
+	@echo ... onion-routing/node/ExitNode.obj
+	@echo ... onion-routing/node/ExitNode.i
+	@echo ... onion-routing/node/ExitNode.s
+	@echo ... onion-routing/node/InputNode.obj
+	@echo ... onion-routing/node/InputNode.i
+	@echo ... onion-routing/node/InputNode.s
+	@echo ... onion-routing/node/Node.obj
+	@echo ... onion-routing/node/Node.i
+	@echo ... onion-routing/node/Node.s
 .PHONY : help
 
 

@@ -3,4 +3,4 @@ project(IDATT2104___Project___Onion_router)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(IDATT2104___Project___Onion_router main.cpp)
+add_executable(IDATT2104___Project___Onion_router main.cpp onion-routing/node/Node.cpp onion-routing/node/Node.h onion-routing/key/Key.cpp onion-routing/key/Key.h onion-routing/client/Client.cpp onion-routing/client/Client.h onion-routing/node/InputNode.cpp onion-routing/node/InputNode.h onion-routing/node/ExitNode.cpp onion-routing/node/ExitNode.h)
