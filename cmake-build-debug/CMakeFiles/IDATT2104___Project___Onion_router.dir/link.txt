@@ -1,3 +1,0 @@
-"C:\Program Files\JetBrains\CLion 2021.3.2\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\IDATT2104___Project___Onion_router.dir/objects.a
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe qc CMakeFiles\IDATT2104___Project___Onion_router.dir/objects.a @CMakeFiles\IDATT2104___Project___Onion_router.dir\objects1.rsp
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE -g -Wl,--whole-archive CMakeFiles\IDATT2104___Project___Onion_router.dir/objects.a -Wl,--no-whole-archive -o IDATT2104___Project___Onion_router.exe -Wl,--out-implib,libIDATT2104___Project___Onion_router.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\IDATT2104___Project___Onion_router.dir\linklibs.rsp
