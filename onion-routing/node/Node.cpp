@@ -84,14 +84,18 @@ void Node::initialize_server_socket(const char *port_nr) {
 
     // Receive until the peer shuts down the connection
     do {
-
+        string brute_force;
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
+        brute_force += recvbuf;
+        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
+        brute_force += recvbuf;
+
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
             SOCKET test = getSocket("localhost","8080");
             // Echo the buffer back to the sender
-            iSendResult = send(test, recvbuf, iResult, 0); //forwarding received message to next/server
+            iSendResult = send(test, brute_force.c_str(), brute_force.size(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
@@ -124,7 +128,6 @@ void Node::initialize_server_socket(const char *port_nr) {
                 else
                     printf("recv failed: %d\n", WSAGetLastError());
             } while (iResult > 0);
-            std::cout<<result;
 
             iSendResult = send(ClientSocket, result.c_str(), result.size(), 0); //Sender til client
             printf("final %d", iSendResult);
