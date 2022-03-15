@@ -11,3 +11,8 @@ Client:
 Routing:
     - https://www.geeksforgeeks.org/onion-routing/
     -
+
+Oppgavefordeling:
+    - Sockets
+    - Autentisering / hashing / crypt
+    - CI / CD
