@@ -115,7 +115,7 @@ void ExitNode::sendGetRequest(const char *ip, const char *port) {
         return;
     }
 
-// Receive data until the server closes the connection
+    // Receive data until the server closes the connection
     do {
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
         if (iResult > 0)
