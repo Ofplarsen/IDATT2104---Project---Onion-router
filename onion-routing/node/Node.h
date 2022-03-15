@@ -6,7 +6,10 @@
 #define IDATT2104___PROJECT___ONION_ROUTER_NODE_H
 
 
-#include "../Key/Key.h"
+#include <string>
+#include "../key/Key.h"
+
+using namespace std;
 
 class Node {
 private:
