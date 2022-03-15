@@ -15,15 +15,17 @@ class Node {
 private:
     Node *prevNode;
     Node *nextNode;
-    Key key;
+    Key private_key;
+    Key public_key;
     string message;
 public:
-    string encrypt(string message){
-
-    }
-    string decrypt(string message){
-
-    }
+    string encrypt(string message);
+    string decrypt(string message);
+    string get_public_key();
+    void send_message(string message);
+    void receive_message(string message);
+    void connect();
+    void initialize_server_socket(const char *port_nr);
 };
 
 
