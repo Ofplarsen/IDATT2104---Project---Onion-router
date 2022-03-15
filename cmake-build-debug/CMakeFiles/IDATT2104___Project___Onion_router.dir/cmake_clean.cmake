@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/IDATT2104___Project___Onion_router.dir/main.cpp.obj"
+  "CMakeFiles/IDATT2104___Project___Onion_router.dir/main.cpp.obj.d"
   "IDATT2104___Project___Onion_router.exe"
   "IDATT2104___Project___Onion_router.exe.manifest"
   "IDATT2104___Project___Onion_router.pdb"
