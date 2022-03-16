@@ -81,14 +81,21 @@ void Node::initialize_server_socket(const char *port_nr) {
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
     int iSendResult;
+    int iStart;
+    string brute_force;
 
     // Receive until the peer shuts down the connection
     do {
-        string brute_force;
+        //do{
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
-        brute_force += recvbuf;
+            brute_force += recvbuf;
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
-        brute_force += recvbuf;
+            brute_force += recvbuf;
+        //} while(iStart > 0);
+
+        //iResult = brute_force.size();
+        std::cout << brute_force << "\n";
+        printf("PRINTINGSOMETHINGCOOL %d\n", iResult);
 
         const char *testSend = "GET / HTTP/1.1\r\n"
                                "Host: www.softwareqatest.com\r\n"
