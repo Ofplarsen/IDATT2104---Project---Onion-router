@@ -17,7 +17,21 @@ private:
 
 public:
     long long int generateKey();
-    long long int getSecretKey();
+    long long int getSecretKey(long long int generatedKey);
+
+    long long int getPrivateKey() const;
+
+    void setPrivateKey(long long int privateKey);
+
+    long long int getPublicKeyP() const;
+
+    void setPublicKeyP(long long int publicKeyP);
+
+    long long int getPublicKeyG() const;
+
+    void setPublicKeyG(long long int publicKeyG);
+
+
 };
 
 

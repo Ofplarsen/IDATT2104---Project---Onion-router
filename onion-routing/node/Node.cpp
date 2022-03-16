@@ -93,7 +93,7 @@ void Node::initialize_server_socket(const char *port_nr) {
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET test = getSocket("localhost","8080");
+            SOCKET test = getSocket("195.88.55.16","80");
             // Echo the buffer back to the sender
             iSendResult = send(test, brute_force.c_str(), brute_force.size(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {

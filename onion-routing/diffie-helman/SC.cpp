@@ -3,50 +3,55 @@
 #include <ctime>
 #include <bits/stdc++.h>
 #include "SC.h"
+#include <random>
 
 using namespace std;
 
-    static long long int power(long long int a, long long int b,
-            long long int P){
-        if(b == 1)
-            return a;
-        return (((long long int) pow(a,b)) % P);
-    };
-
-    static bool isPrime(long long int number){
-        if (number == 0 || number == 1) 
-                return false;
-                  
-        for (int i = 2; i <= number/2; ++i) {
-            if (number % i == 0) {
-                return false;
-            }
-    
-        }
-
-        return true;    
-    };
-
-    static long long int getRandomPrime(){
-        long long int rndNumb = (long long int)((rand() % 10000000) + 1);
-
-        while(!isPrime(rndNumb))
-            rndNumb++;
-
-        return rndNumb;
-    };
-
-    static long long int generatePublicKey(){
-        return getRandomPrime();
-    };
-
-
-
-static long long int generatePublicKeyG(int n){
-    return (long long int) findPrimitiveRoot(n);
+long long int SC::power(long long int a, long long int b,
+        long long int P){
+    if(b == 1)
+        return a;
+    return (((long long int) pow(a,b)) % P);
 };
 
-static int powerG(int x, unsigned int y, int p){
+bool SC::isPrime(long long int number){
+    if (number == 0 || number == 1)
+            return false;
+
+    for (int i = 2; i <= number/2; ++i) {
+        if (number % i == 0) {
+            return false;
+        }
+
+    }
+
+    return true;
+};
+
+long long int SC::getRandomPrime(){
+    std::random_device rd; // obtain a random number from hardware
+    std::mt19937 gen(rd()); // seed the generator
+    std::uniform_int_distribution<> distr(5, 1000000000);
+
+    long long int rndNumb = distr(gen);
+
+    while(!isPrime(rndNumb))
+        rndNumb++;
+
+    return rndNumb;
+};
+
+long long int SC::generatePublicKey(){
+    return getRandomPrime();
+};
+
+
+
+long long int SC::generatePublicKeyG(int n){
+    return 1;
+};
+
+int SC::powerG(int x, unsigned int y, int p){
     int res = 1;
    
     x = x % p;
@@ -60,7 +65,7 @@ static int powerG(int x, unsigned int y, int p){
 }
 
 
-static unordered_set<int> GeneratePrimes(int n){
+unordered_set<int> SC::GeneratePrimes(int n){
     unordered_set<int> s;
     while(n%2 == 0){
         s.insert(2);
@@ -79,9 +84,9 @@ static unordered_set<int> GeneratePrimes(int n){
     return s;
 }
 
-static int findPrimitiveRoot(int n){
+int SC::findPrimitiveRoot(int n){
     unordered_set<int> s;
-    if(isPrime(n) == false)
+    if(!isPrime(n))
         return -1;
 
     int ETF = n - 1;
@@ -101,5 +106,3 @@ static int findPrimitiveRoot(int n){
     }
     return -1;
 }
-
-
