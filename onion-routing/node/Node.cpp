@@ -90,12 +90,17 @@ void Node::initialize_server_socket(const char *port_nr) {
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
         brute_force += recvbuf;
 
+        const char *testSend = "GET / HTTP/1.1\r\n"
+                               "Host: www.softwareqatest.com\r\n"
+                               "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\n"
+                               "Connection: close\r\n\r\n";
+
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET test = getSocket("localhost","8080");
+            SOCKET test = getSocket("216.92.49.183","80");
             // Echo the buffer back to the sender
-            iSendResult = send(test, brute_force.c_str(), brute_force.size(), 0); //forwarding received message to next/server
+            iSendResult = send(test, testSend, (int) strlen(testSend), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
