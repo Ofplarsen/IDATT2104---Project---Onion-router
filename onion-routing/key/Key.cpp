@@ -6,11 +6,11 @@
 #include "../diffie-helman/SC.h"
 
     long long int Key::generateKey(){
-        generatedKey = SC.power(publicKey2, privateKey ,publicKey1);
+        generatedKey = SC::power(publicKeyG, privateKey ,publicKeyP);
         return generatedKey;
     };
 
     long long int Key::getSecretKey(){
-        secretKey = SC.power(generatedKey, privateKey, publicKey);
+        secretKey = SC::power(generatedKey, privateKey, publicKeyP);
         return secretKey;
     };
