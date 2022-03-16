@@ -8,8 +8,16 @@
 
 class Key {
 private:
-    int privateKey;
-    int publicKey;
+    long long int privateKey;
+    long long int publicKey1;
+    long long int publicKey2;
+    long long int generatedKey;
+    long long int secretKey;
+
+
+
+    long long int generateKey();
+    long long int getSecretKey();
 };
 
 
