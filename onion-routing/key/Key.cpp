@@ -3,17 +3,14 @@
 //
 
 #include "Key.h"
-#include "../SC/SC.h"
+#include "../diffie-helman/SC.h"
 
-class Key {
-
-    long long int generateKey(){
+    long long int Key::generateKey(){
         generatedKey = SC.power(publicKey2, privateKey ,publicKey1);
         return generatedKey;
-    }
+    };
 
-    long long int getSecretKey(){
+    long long int Key::getSecretKey(){
         secretKey = SC.power(generatedKey, privateKey, publicKey);
         return secretKey;
-    }
-}
+    };
