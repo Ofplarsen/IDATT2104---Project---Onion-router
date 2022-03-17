@@ -85,7 +85,7 @@ void Node::initialize_server_socket(const char *port_nr) {
     int iStart;
     string initial_user_req;
     string user_url;
-    regex url_regex("^www\\.?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$");
+    //regex url_regex("^www\\.?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$"); //Does not work as expected
     regex url_regex2("[www\\.?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
     smatch match;
     string get_req_domain;
@@ -103,6 +103,19 @@ void Node::initialize_server_socket(const char *port_nr) {
         regex_search(initial_user_req, match, url_regex2);
         for(auto x: match)std::cout << x << "\n";
         std::cout << initial_user_req << "\n";
+        int user_arg_end;
+        bool contains_path = false;
+        int path_length = 0;
+        for(user_arg_end = 5; initial_user_req[user_arg_end] != ' '; user_arg_end++){
+            if(initial_user_req[user_arg_end] == '/') contains_path = true;
+            if(contains_path) path_length++;
+        }
+        printf("%d",path_length);
+        string domain_name = initial_user_req.substr(5, user_arg_end - 5 - path_length); //Domain name always starts at position 5 in get request, then goes up to the length of the entire URL - path size - offset
+        std::cout << domain_name << "\n";
+        string path;
+        if(contains_path) path = initial_user_req.substr(1 + user_arg_end - path_length, path_length); //Path starts right after /, therefore +1
+        std::cout << path << "\n";
 
         //constructing a get request that the node will send to socket on internet
         //TODO memory????????qatlnks1.html
