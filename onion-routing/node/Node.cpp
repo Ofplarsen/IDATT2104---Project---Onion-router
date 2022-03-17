@@ -88,14 +88,15 @@ void Node::initialize_server_socket(const char *port_nr) {
     do {
         //do{
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
-            brute_force += recvbuf;
+        printf("Bytes received: %d\n", iResult);
+        brute_force += string(recvbuf).substr(0, iResult);
+
         iResult = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
-            brute_force += recvbuf;
+            brute_force += string(recvbuf).substr(0, iResult);
         //} while(iStart > 0);
 
         //iResult = brute_force.size();
         std::cout << brute_force << "\n";
-        printf("PRINTINGSOMETHINGCOOL %d\n", iResult);
 
         const char *testSend = "GET / HTTP/1.1\r\n"
                                "Host: www.softwareqatest.com\r\n"
