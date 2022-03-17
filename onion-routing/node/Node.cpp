@@ -82,21 +82,20 @@ void Node::initialize_server_socket(const char *port_nr) {
     int recvbuflen = DEFAULT_BUFLEN;
     int iSendResult;
     int iStart;
-    string brute_force;
+    string initial_user_req;
 
     // Receive until the peer shuts down the connection
     do {
-        //do{
-        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
-        printf("Bytes received: %d\n", iResult);
-        brute_force += string(recvbuf).substr(0, iResult);
-
-        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
-            brute_force += string(recvbuf).substr(0, iResult);
-        //} while(iStart > 0);
+        do{
+        printf("Starting another round");
+        iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
+        printf("Bytes received: %d\n", iStart);
+        initial_user_req += string(recvbuf).substr(0, iStart);
+        iResult = iStart;
+        } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
 
         //iResult = brute_force.size();
-        std::cout << brute_force << "\n";
+        std::cout << initial_user_req << "\n";
 
         const char *testSend = "GET / HTTP/1.1\r\n"
                                "Host: www.softwareqatest.com\r\n"
