@@ -6,6 +6,7 @@
 #include <iostream>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <regex>
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
@@ -83,21 +84,49 @@ void Node::initialize_server_socket(const char *port_nr) {
     int iSendResult;
     int iStart;
     string initial_user_req;
+    string user_url;
+    regex url_regex("^www\\.?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$");
+    regex url_regex2("[www\\.?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
+    smatch match;
+    string get_req_domain;
 
     // Receive until the peer shuts down the connection
     do {
-        do{
-        printf("Starting another round");
+        do {
         iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
         printf("Bytes received: %d\n", iStart);
         initial_user_req += string(recvbuf).substr(0, iStart);
         iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
 
-        //iResult = brute_force.size();
+        //Looking for domain name in user request from browser
+        regex_search(initial_user_req, match, url_regex2);
+        for(auto x: match)std::cout << x << "\n";
         std::cout << initial_user_req << "\n";
 
-        const char *testSend = "GET / HTTP/1.1\r\n"
+        //constructing a get request that the node will send to socket on internet
+        //TODO memory????????qatlnks1.html
+        const char *get_req_pre = "GET / HTTP/1.1\r\nHost: ";
+        get_req_domain = match[0].str(); //Extracting domain name from the regex matches
+        const char *get_req_post = "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\nConnection: close\r\n\r\n";
+        string get_req = get_req_pre + get_req_domain + get_req_post;
+        const char *get_req_ptr = get_req.c_str();
+        std::cout << get_req << std::endl;
+        //TODO memory????????
+
+        //getting IP address from domain sent in by user
+        hostent *webDomain = gethostbyname(get_req_domain.c_str());
+        in_addr *addr; //To get  char  version of ip: inet_ntoa(*addr)
+        for(int i = 0; ; ++i) //Purposefully left the second condition out, because we will be testing for it inside the loop.
+        {
+            char *temp = webDomain->h_addr_list[i];
+            if(temp == NULL) //we reached the end of the list
+                break; //exit the loop.
+
+            addr = reinterpret_cast<in_addr*>(temp);
+        }
+
+        const char *testSend = "GET /qatfaq1.html HTTP/1.1\r\n"
                                "Host: www.softwareqatest.com\r\n"
                                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\n"
                                "Connection: close\r\n\r\n";
@@ -105,9 +134,9 @@ void Node::initialize_server_socket(const char *port_nr) {
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET test = getSocket("216.92.49.183","80");
+            SOCKET test = getSocket(inet_ntoa(*addr), "80");
             // Echo the buffer back to the sender
-            iSendResult = send(test, testSend, (int) strlen(testSend), 0); //forwarding received message to next/server
+            iSendResult = send(test, get_req_ptr, (int) strlen(get_req_ptr), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
