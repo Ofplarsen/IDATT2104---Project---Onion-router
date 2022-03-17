@@ -57,19 +57,28 @@ int main(int argc, char const *argv[])
     string s = to_string(secretKey);
     unsigned char key[10+ sizeof (char)];
     unsigned char text[16]="hello world thi";
-    vector<char[16]>
+    vector<unsigned char[16]> vector;
     unsigned char enc_out[16];
     unsigned char dec_out[16];
     std::sprintf((char *) key, "%d", secretKey);
     unsigned char encrypted[sizeof text];
     unsigned char decrypted[sizeof text];
+    for(int l = 0; l < ceil(sizeof text / 16); l++){
+        int i = 0;
+        while(i < 16){
+            if(*(text+i)==0x00)
+                break;
+            vector[l][i] =  *(text+i);
+            i++;
+        }
+    }
     AES_KEY enc_key, dec_key;
     int x = 0;
     int y = 0;
     AES_set_encrypt_key(key, 128, &enc_key);
     AES_set_decrypt_key(key, 128, &dec_key);
-    for(int f = 0; f < ceil(sizeof text / 16); f++){
-        AES_encrypt(text, enc_out, &enc_key);
+    for(int f = 0; f < vector.size(); f++){
+        AES_encrypt(vector[f], enc_out, &enc_key);
         int i = 0;
         while(i < 16){
             if(*(enc_out+i)==0x00)
