@@ -19,43 +19,12 @@
 #include <stdint.h>
 #include <assert.h>
 #include <string.h>
+#include <openssl/aes.h>
+
 #define PORT 8080
 
 
 
-void handleErrors(void)
-{
-    ERR_print_errors_fp(stderr);
-    abort();
-}
-
-int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
-            unsigned char *iv, unsigned char *ciphertext)
-{
-    EVP_CIPHER_CTX *ctx;
-
-    int len;
-
-    int ciphertext_len;
-
-    /* Create and initialise the context */
-    if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
-
-    if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_ecb(), NULL, key, iv))
-        handleErrors();
-
-    if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
-        handleErrors();
-    ciphertext_len = len;
-
-    if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) handleErrors();
-    ciphertext_len += len;
-
-    /* Clean up */
-    EVP_CIPHER_CTX_free(ctx);
-
-    return ciphertext_len;
-}
 
 int main(int argc, char const *argv[])
 {
@@ -87,32 +56,32 @@ int main(int argc, char const *argv[])
 
     string s = to_string(secretKey);
     unsigned char key[10+ sizeof (char)];
-    unsigned char text[]="hello world this is a longer string!";
+    unsigned char text[]="hello world this is another test";
     unsigned char enc_out[80];
     unsigned char dec_out[80];
     std::sprintf((char *) key, "%d", secretKey);
 
-        AES_KEY enc_key, dec_key;
+    AES_KEY enc_key, dec_key;
 
-        AES_set_encrypt_key(key, 128, &enc_key);
-        AES_encrypt(text, enc_out, &enc_key);
+    AES_set_encrypt_key(key, 128, &enc_key);
+    AES_encrypt(text, enc_out, &enc_key);
 
-        AES_set_decrypt_key(key,128,&dec_key);
-        AES_decrypt(enc_out, dec_out, &dec_key);
+    AES_set_decrypt_key(key,128,&dec_key);
+    AES_decrypt(enc_out, dec_out, &dec_key);
 
-        int i;
+    int i;
 
-        printf("original:\t");
-        for(i=0;*(text+i)!=0x00;i++)
-            printf("%X ",*(text+i));
-        printf("\nencrypted:\t");
-        for(i=0;*(enc_out+i)!=0x00;i++)
-            printf("%X ",*(enc_out+i));
-        printf("\ndecrypted:\t");
-        for(i=0;*(dec_out+i)!=0x00;i++)
-            printf("%X ",*(dec_out+i));
-        printf("\n");
+    printf("original:\t");
+    for(i=0;*(text+i)!=0x00;i++)
+        printf("%X ",*(text+i));
+    printf("\nencrypted:\t");
+    for(i=0;*(enc_out+i)!=0x00;i++)
+        printf("%X ",*(enc_out+i));
+    printf("\ndecrypted:\t");
+    for(i=0;*(dec_out+i)!=0x00;i++)
+        printf("%X ",*(dec_out+i));
+    printf("\n");
 
 
-        return 0;
+    return 0;
 }
