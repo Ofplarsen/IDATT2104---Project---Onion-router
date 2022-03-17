@@ -20,7 +20,8 @@
 #include <assert.h>
 #include <string.h>
 #include <openssl/aes.h>
-
+#include <cmath>
+#include <vector>
 #define PORT 8080
 
 
@@ -53,21 +54,43 @@ int main(int argc, char const *argv[])
     //cout << annaKey.getPublicKeyP() << endl;
     //cout << (Crypter::decrypt(encrypted, annaKey.getSecretKey(bobKey.generateKey()), annaKey.getPublicKeyP())) << endl;
 
-
     string s = to_string(secretKey);
     unsigned char key[10+ sizeof (char)];
-    unsigned char text[]="hello world this is another test";
-    unsigned char enc_out[80];
-    unsigned char dec_out[80];
+    unsigned char text[16]="hello world thi";
+    vector<char[16]>
+    unsigned char enc_out[16];
+    unsigned char dec_out[16];
     std::sprintf((char *) key, "%d", secretKey);
-
+    unsigned char encrypted[sizeof text];
+    unsigned char decrypted[sizeof text];
     AES_KEY enc_key, dec_key;
-
+    int x = 0;
+    int y = 0;
     AES_set_encrypt_key(key, 128, &enc_key);
-    AES_encrypt(text, enc_out, &enc_key);
+    AES_set_decrypt_key(key, 128, &dec_key);
+    for(int f = 0; f < ceil(sizeof text / 16); f++){
+        AES_encrypt(text, enc_out, &enc_key);
+        int i = 0;
+        while(i < 16){
+            if(*(enc_out+i)==0x00)
+                break;
+            encrypted[x] =  *(enc_out+i);
+            x++;
+            i++;
+        }
 
-    AES_set_decrypt_key(key,128,&dec_key);
-    AES_decrypt(enc_out, dec_out, &dec_key);
+        AES_decrypt(enc_out, dec_out, &dec_key);
+
+        i = 0;
+        while(i < 16){
+            if(*(dec_out+i)==0x00)
+                break;
+            decrypted[y] =  *(dec_out+i);
+            y++;
+            i++;
+        }
+
+    }
 
     int i;
 
@@ -75,10 +98,10 @@ int main(int argc, char const *argv[])
     for(i=0;*(text+i)!=0x00;i++)
         printf("%X ",*(text+i));
     printf("\nencrypted:\t");
-    for(i=0;*(enc_out+i)!=0x00;i++)
+    for(i=0;*(encrypted+i)!=0x00;i++)
         printf("%X ",*(enc_out+i));
     printf("\ndecrypted:\t");
-    for(i=0;*(dec_out+i)!=0x00;i++)
+    for(i=0;*(decrypted+i)!=0x00;i++)
         printf("%X ",*(dec_out+i));
     printf("\n");
 
