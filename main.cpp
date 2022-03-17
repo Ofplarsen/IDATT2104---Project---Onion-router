@@ -25,13 +25,15 @@ int main(int argc, char const *argv[])
     cout << publicKey << endl;
     cout << primitiveRoot << endl;
 
-    annaKey.setPrivateKey(13);
-    bobKey.setPrivateKey(17);
+    annaKey.setPrivateKey(6);
+    bobKey.setPrivateKey(8);
 
     cout << annaKey.getSecretKey(bobKey.generateKey()) << endl;
     cout << bobKey.getSecretKey(annaKey.generateKey()) << endl;
     int encrypted = Crypter::encrypt('d', annaKey.getSecretKey(bobKey.generateKey()), annaKey.getPublicKeyP());
     cout << encrypted << endl;
-    cout << static_cast<char>(Crypter::decrypt(encrypted, annaKey.getSecretKey(bobKey.generateKey()), annaKey.getPublicKeyP())) << endl;
+    cout << annaKey.getSecretKey(bobKey.generateKey()) << endl;
+    cout << annaKey.getPublicKeyP() << endl;
+    cout << (Crypter::decrypt(encrypted, annaKey.getSecretKey(bobKey.generateKey()), annaKey.getPublicKeyP())) << endl;
     return 0;
 }

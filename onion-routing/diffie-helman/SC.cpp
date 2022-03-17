@@ -7,7 +7,7 @@
 
 using namespace std;
 
-long long int SC::power(long long int a, long long int b,
+unsigned long long int SC::power(long long int a, long long int b,
         long long int P){
     if(b == 1)
         return a;
@@ -28,30 +28,29 @@ bool SC::isPrime(long long int number){
     return true;
 };
 
-long long int SC::getRandomPrime(){
+unsigned long long int SC::getRandomPrime(){
     std::random_device rd; // obtain a random number from hardware
     std::mt19937 gen(rd()); // seed the generator
-    std::uniform_int_distribution<> distr(5, 1000000000);
+    std::uniform_int_distribution<> distr(5, 10000000);
 
     long long int rndNumb = distr(gen);
 
     while(!isPrime(rndNumb))
         rndNumb++;
-
     return rndNumb;
 };
 
-long long int SC::generatePublicKey(){
+unsigned long long int SC::generatePublicKey(){
     return getRandomPrime();
 };
 
 
 
-long long int SC::generatePublicKeyG(int n){
+unsigned long long int SC::generatePublicKeyG(int n){
     return 1;
 };
 
-int SC::powerG(int x, unsigned int y, int p){
+unsigned long long int SC::powerG(int x, unsigned int y, int p){
     int res = 1;
    
     x = x % p;
@@ -84,9 +83,26 @@ unordered_set<int> SC::GeneratePrimes(int n){
     return s;
 }
 
+bool SC::isPrime2(long long int n)
+{
+    // Corner cases
+    if (n <= 1)  return false;
+    if (n <= 3)  return true;
+
+    // This is checked so that we can skip
+    // middle five numbers in below loop
+    if (n%2 == 0 || n%3 == 0) return false;
+
+    for (int i=5; i*i<=n; i=i+6)
+        if (n%i == 0 || n%(i+2) == 0)
+            return false;
+
+    return true;
+}
+
 int SC::findPrimitiveRoot(int n){
     unordered_set<int> s;
-    if(!isPrime(n))
+    if(!isPrime2(n))
         return -1;
 
     int ETF = n - 1;
@@ -96,7 +112,7 @@ int SC::findPrimitiveRoot(int n){
         bool flag = false;
 
         for(auto it = s.begin(); it != s.end(); it++){
-            if(power(r, ETF/(*it), n) == 1){
+            if(powerG(r, ETF/(*it), n) == 1){
                 flag = true;
                 break;
             }

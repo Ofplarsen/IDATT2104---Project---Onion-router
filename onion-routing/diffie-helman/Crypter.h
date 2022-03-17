@@ -9,7 +9,7 @@
 class Crypter {
 public:
     static int decrypt(int message, int key, int publicKey);
-    static int encrypt(int message, int key, int publicKey);
+    static unsigned long long int encrypt(int message, int key, int publicKey);
 
     static int modInverse(int a, int m);
 };
