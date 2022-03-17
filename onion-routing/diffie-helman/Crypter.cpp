@@ -5,7 +5,7 @@
 #include "Crypter.h"
 
 int Crypter::decrypt(int message, int key, int publicKey) {
-    return (message / modInverse(key, publicKey))%publicKey;
+    return modInverse(message*key, publicKey);
 }
 
 unsigned long long int Crypter::encrypt(int message, int key, int publicKey) {
@@ -18,3 +18,4 @@ int Crypter::modInverse(int a, int m)
         if (((a%m) * (x%m)) % m == 1)
             return x;
 }
+
