@@ -85,8 +85,6 @@ void Node::initialize_server_socket(const char *port_nr) {
     int iStart;
     string initial_user_req;
     string user_url;
-    //regex url_regex("^www\\.?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$"); //Does not work as expected
-    regex url_regex2("[www\\.?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
     smatch match;
     string get_req_domain;
 
@@ -100,9 +98,6 @@ void Node::initialize_server_socket(const char *port_nr) {
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
 
         //Looking for domain name in user request from browser
-        regex_search(initial_user_req, match, url_regex2);
-        for(auto x: match)std::cout << x << "\n";
-        std::cout << initial_user_req << "\n";
         int user_arg_end;
         bool contains_path = false;
         int path_length = 0;
@@ -114,15 +109,17 @@ void Node::initialize_server_socket(const char *port_nr) {
         string domain_name = initial_user_req.substr(5, user_arg_end - 5 - path_length); //Domain name always starts at position 5 in get request, then goes up to the length of the entire URL - path size - offset
         std::cout << domain_name << "\n";
         string path;
-        if(contains_path) path = initial_user_req.substr(1 + user_arg_end - path_length, path_length); //Path starts right after /, therefore +1
+        if(contains_path) path = initial_user_req.substr(1 + user_arg_end - path_length, path_length - 1); //Path starts right after /, therefore +1
         std::cout << path << "\n";
 
         //constructing a get request that the node will send to socket on internet
+
         //TODO memory????????qatlnks1.html
-        const char *get_req_pre = "GET / HTTP/1.1\r\nHost: ";
-        get_req_domain = match[0].str(); //Extracting domain name from the regex matches
+        const char *get_req_pre_pre = "GET /";
+        const char *get_req_pre = " HTTP/1.1\r\nHost: ";
+        get_req_domain = domain_name; //Extracting domain name from the regex matches
         const char *get_req_post = "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\nConnection: close\r\n\r\n";
-        string get_req = get_req_pre + get_req_domain + get_req_post;
+        string get_req = get_req_pre_pre + path + get_req_pre + get_req_domain + get_req_post;
         const char *get_req_ptr = get_req.c_str();
         std::cout << get_req << std::endl;
         //TODO memory????????
