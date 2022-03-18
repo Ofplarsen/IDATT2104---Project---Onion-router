@@ -20,6 +20,7 @@ class SC{
         static int findPrimitiveRoot(int n);
 
         static bool isPrime2(long long int n);
+        static void initRandom();
 };
 
 

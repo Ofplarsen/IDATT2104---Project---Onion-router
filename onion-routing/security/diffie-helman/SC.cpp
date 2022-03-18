@@ -29,12 +29,8 @@ bool SC::isPrime(long long int number){
 };
 
 unsigned long long int SC::getRandomPrime(){
-    std::random_device rd; // obtain a random number from hardware
-    std::mt19937 gen(rd()); // seed the generator
-    std::uniform_int_distribution<> distr(5, 10000000);
-
-    long long int rndNumb = distr(gen);
-
+    long long int rndNumb = rand() % 100000000;
+    cout << (rndNumb) << endl;
     while(!isPrime(rndNumb))
         rndNumb++;
     return rndNumb;
@@ -121,4 +117,8 @@ int SC::findPrimitiveRoot(int n){
             return r;
     }
     return -1;
+}
+
+void SC::initRandom() {
+    srand((unsigned) time(NULL));
 }

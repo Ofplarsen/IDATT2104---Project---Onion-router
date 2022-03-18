@@ -1,12 +1,14 @@
 //
 // Created by xray2 on 16/03/2022.
 //
-#include <math.h>
+#include <cmath>
 #include <openssl/evp.h>
 #include <openssl/err.h>
 #include <openssl/bio.h>
+#include <cstring>
+#include "../string-modifier/StringModifier.h"
 #include "Crypter.h"
-
+#include "../model/Cryption.h"
 int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, unsigned char* text){
     int text_len = 0;
     int len = 0;
@@ -75,4 +77,41 @@ int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsi
 
     return cipher_len;
 }
+
+Cryption Crypter::encryptString(Cryption cryption,long long int key) {
+
+    //std::vector<std::string> strings = StringModifier::splitString(text, 32);
+
+    std::vector<std::string> returnValue;
+    std::vector<int> returnLengths;
+    for(auto & string : cryption.getStrings()){
+        unsigned char* temp = StringModifier::convertToCharArray(string);
+        unsigned char encrypted[64];
+        int encrypted_len = encrypt(temp, strlen(reinterpret_cast<const char *>(temp)), StringModifier::convertToCharArray(std::to_string(key)), encrypted);
+
+        returnLengths.emplace_back(encrypted_len);
+        returnValue.emplace_back((encrypted));
+    }
+
+
+
+    return Cryption(returnValue, returnLengths);
+}
+
+Cryption Crypter::decryptString(Cryption cryption, long long int key) {
+
+    std::vector<std::string> returnValue;
+    std::vector<int> returnLengths;
+    for(auto & string : cryption.getStrings()){
+        unsigned char* temp = StringModifier::convertToCharArray(string);
+        unsigned char decrypted[64];
+        int dec_len = decrypt(temp, strlen(reinterpret_cast<const char *>(temp)), StringModifier::convertToCharArray(std::to_string(key)), decrypted);
+
+        returnLengths.emplace_back(dec_len);
+        returnValue.emplace_back(reinterpret_cast<char*>(decrypted));
+    }
+
+    return Cryption(returnValue, returnLengths);
+}
+
 

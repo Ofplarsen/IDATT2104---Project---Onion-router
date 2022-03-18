@@ -9,6 +9,8 @@
 #include "onion-routing/node/ExitNode.h"
 #include "onion-routing/security/diffie-helman/SC.h"
 #include "onion-routing/security/aes/Crypter.h"
+#include "onion-routing/security/model/Cryption.h"
+#include "onion-routing/security/string-modifier/StringModifier.h"
 #include <openssl/conf.h>
 #include <openssl/evp.h>
 #include <openssl/err.h>
@@ -24,8 +26,22 @@
 #include <vector>
 #define PORT 8080
 
-int main(int argc, char const *argv[]){
+unsigned char* convertToCharArray(long long int a)
+{
+    unsigned char* arr;
+    int i = 0;
 
+    for (i = 0; i < 8; ++i)
+    {
+        arr[i] = (unsigned char)((((unsigned long long) a) >> (56 - (8*i))) & 0xFFu);
+    }
+    return arr;
+}
+
+
+
+int main(int argc, char const *argv[]){
+    SC::initRandom();
     Key annaKey;
     Key bobKey;
     long long int publicKey = SC::generatePublicKey();
@@ -38,66 +54,46 @@ int main(int argc, char const *argv[]){
     cout << publicKey << endl;
     cout << primitiveRoot << endl;
 
-    annaKey.setPrivateKey(103);
-    bobKey.setPrivateKey(101);
+    annaKey.setPrivateKey(2354);
+    bobKey.setPrivateKey(13132);
     unsigned long long int secretKey = annaKey.getSecretKey(bobKey.generateKey());
+    cout << secretKey << endl;
     secretKey = secretKey / 10000;
     cout << secretKey << endl;
+    string textTest = "This is a longer messa";
+    //unsigned char* key = convertToCharArray(secretKey);
+    unsigned char* key = (unsigned char*)"1234567890123456";
 
-    unsigned char* key = (unsigned char*) "1234567890123456";
-    unsigned char* text = (unsigned char*)"My secret message is now longer";
+    unsigned char* key2 = (unsigned char*)"1234567890123457";
+    std::string text = "My secret message is now longer";
+    vector<int> t;
 
-    int text_len = strlen((const char*)text);
-    unsigned char cipher[64];
+    Cryption cryption(StringModifier::splitString(text, 32));
 
-    printf("cipher=\n");
+    //int text_len = strlen((const char*)text);
+    //unsigned char cipher[64];
 
-    int cipher_len = Crypter::encrypt(text, text_len, key, cipher);
+    //printf("cipher=\n");
 
-    for(int i = 0; i < cipher_len; i++){
-        printf("%02x ", cipher[i]);
+    //int cipher_len = Crypter::encrypt(text, text_len, key, cipher);
+    Crypter c;
+    Cryption enc = c.encryptString(cryption, 1234567890123456);
+
+    for(int i = 0; i < enc.getStrings().size(); i++){
+        for(int y = 0; y < enc.getStringsLen()[y]; y++){
+            printf("%02x ", enc.getStrings()[i][y]);
+        }
     }
-    printf("\n");
 
+    /*
     printf("decrypted = \n");
     unsigned char decrypted[64];
-    int dec_len = Crypter::decrypt(cipher, cipher_len, key,decrypted);
-
+    int dec_len = Crypter::decrypt(cipher2, cipher2_len, key2,decrypted);
     for(int i = 0; i < dec_len; i++){
         printf("%c", (const char)decrypted[i]);
     }
-    printf("\n");
+
+     */
 
     return 0;
 }
-
-/*
-int main(int argc, char const *argv[])
-{
-
-    Key annaKey;
-    Key bobKey;
-    long long int publicKey = SC::generatePublicKey();
-    long long int primitiveRoot = SC::findPrimitiveRoot(publicKey);
-    annaKey.setPublicKeyP(publicKey);
-    annaKey.setPublicKeyG(primitiveRoot);
-    bobKey.setPublicKeyP(publicKey);
-    bobKey.setPublicKeyG(primitiveRoot);
-
-    cout << publicKey << endl;
-    cout << primitiveRoot << endl;
-
-    annaKey.setPrivateKey(103);
-    bobKey.setPrivateKey(101);
-    unsigned long long int secretKey = annaKey.getSecretKey(bobKey.generateKey());
-    secretKey = secretKey / 10000;
-    cout << secretKey << endl;
-    //cout << bobKey.getSecretKey(annaKey.generateKey()) << endl;
-    //int encrypted = Crypter::encrypt('d', annaKey.getSecretKey(bobKey.generateKey()), annaKey.getPublicKeyP());
-
-    //cout << annaKey.getSecretKey(bobKey.generateKey()) << endl;
-    //cout << annaKey.getPublicKeyP() << endl;
-    //cout << (Crypter::decrypt(encrypted, annaKey.getSecretKey(bobKey.generateKey()), annaKey.getPublicKeyP())) << endl;
-
-}
-*/
