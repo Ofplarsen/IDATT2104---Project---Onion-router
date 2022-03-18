@@ -85,8 +85,6 @@ void Node::initialize_server_socket(const char *port_nr) {
     int iStart;
     string initial_user_req;
     string user_url;
-    smatch match;
-    string get_req_domain;
 
     // Receive until the peer shuts down the connection
     do {
@@ -97,7 +95,7 @@ void Node::initialize_server_socket(const char *port_nr) {
         iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
 
-        //Looking for domain name in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
+        //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
         int user_arg_end;
         bool contains_path = false;
         int path_length = 0;
@@ -113,15 +111,14 @@ void Node::initialize_server_socket(const char *port_nr) {
         //TODO memory????????qatlnks1.html
         const char *get_req_pre_pre = "GET /";
         const char *get_req_pre = " HTTP/1.1\r\nHost: ";
-        get_req_domain = domain_name; //Extracting domain name from the regex matches
         const char *get_req_post = "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\nConnection: close\r\n\r\n";
-        string get_req = get_req_pre_pre + path + get_req_pre + get_req_domain + get_req_post;
+        string get_req = get_req_pre_pre + path + get_req_pre + domain_name + get_req_post;
         const char *get_req_ptr = get_req.c_str();
         std::cout << get_req << std::endl;
         //TODO memory????????
 
         //getting IP address from domain sent in by user
-        hostent *webDomain = gethostbyname(get_req_domain.c_str());
+        hostent *webDomain = gethostbyname(domain_name.c_str());
         in_addr *addr; //To get  char  version of ip: inet_ntoa(*addr)
         for(int i = 0; ; ++i) //Purposefully left the second condition out, because we will be testing for it inside the loop.
         {
@@ -135,28 +132,27 @@ void Node::initialize_server_socket(const char *port_nr) {
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET test = getSocket(inet_ntoa(*addr), "80");
-            // Echo the buffer back to the sender
-            iSendResult = send(test, get_req_ptr, (int) strlen(get_req_ptr), 0); //forwarding received message to next/server
+            SOCKET web_page_socket = getSocket(inet_ntoa(*addr), "80");
+            iSendResult = send(web_page_socket, get_req_ptr, (int) strlen(get_req_ptr), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
                 WSACleanup();
                 return;
             }
+            printf("Bytes sent: %d\n", iSendResult); // Echo the buffer back to the sender
 
-            iResult = shutdown(test, SD_SEND); //doesnt send more data
+            //TODO can we move this down as with the shutdown of ClientSocket?
+            iResult = shutdown(web_page_socket, SD_SEND); //doesnt send more data
             if (iResult == SOCKET_ERROR) { //OBS OBS
                 printf("shutdown failed: %d\n", WSAGetLastError());
-                closesocket(test);
+                closesocket(web_page_socket);
                 WSACleanup();
                 return;
             }
 
-            string recv_string;
-            printf("Bytes sent: %d\n", iSendResult);
             do {
-                iResult = recv(test, recvbuf, recvbuflen, 0); //Receiving from nextNode
+                iResult = recv(web_page_socket, recvbuf, recvbuflen, 0); //Receiving from nextNode
                 iSendResult = send(ClientSocket, recvbuf, recvbuflen, 0); //Sending back to prevNode immediately
                 if (iSendResult == SOCKET_ERROR) {
                     printf("send failed: %d\n", WSAGetLastError());
@@ -174,19 +170,13 @@ void Node::initialize_server_socket(const char *port_nr) {
                     printf("recv failed: %d\n", WSAGetLastError());
             } while (iResult > 0);
 
-            printf("final %d", iSendResult);
+            printf("final %d\n", iSendResult);
 
 
-
-
-            /*char chars[recvbuflen + 1];
-            memcpy(chars, recvbuf, recvbuflen);
-            chars[recvbuflen] = '\0';       // Null-terminate the string
-
-            std::cout << chars;*/
-
-        } else if (iResult == 0)
+        }
+        else if (iResult == 0) {
             printf("Connection closing...\n");
+        }
         else {
             printf("recv failed: %d\n", WSAGetLastError());
             closesocket(ClientSocket);
