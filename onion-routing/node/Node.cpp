@@ -97,23 +97,19 @@ void Node::initialize_server_socket(const char *port_nr) {
         iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
 
-        //Looking for domain name in user request from browser
+        //Looking for domain name in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
         int user_arg_end;
         bool contains_path = false;
         int path_length = 0;
+        string path;
         for(user_arg_end = 5; initial_user_req[user_arg_end] != ' '; user_arg_end++){
             if(initial_user_req[user_arg_end] == '/') contains_path = true;
             if(contains_path) path_length++;
         }
-        printf("%d",path_length);
         string domain_name = initial_user_req.substr(5, user_arg_end - 5 - path_length); //Domain name always starts at position 5 in get request, then goes up to the length of the entire URL - path size - offset
-        std::cout << domain_name << "\n";
-        string path;
         if(contains_path) path = initial_user_req.substr(1 + user_arg_end - path_length, path_length - 1); //Path starts right after /, therefore +1
-        std::cout << path << "\n";
 
         //constructing a get request that the node will send to socket on internet
-
         //TODO memory????????qatlnks1.html
         const char *get_req_pre_pre = "GET /";
         const char *get_req_pre = " HTTP/1.1\r\nHost: ";
@@ -136,11 +132,6 @@ void Node::initialize_server_socket(const char *port_nr) {
             addr = reinterpret_cast<in_addr*>(temp);
         }
 
-        const char *testSend = "GET /qatfaq1.html HTTP/1.1\r\n"
-                               "Host: www.softwareqatest.com\r\n"
-                               "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\n"
-                               "Connection: close\r\n\r\n";
-
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
@@ -162,17 +153,20 @@ void Node::initialize_server_socket(const char *port_nr) {
                 return;
             }
 
-
-            string result;
+            string recv_string;
             printf("Bytes sent: %d\n", iSendResult);
             do {
-                iResult = recv(test, recvbuf, recvbuflen, 0);
+                iResult = recv(test, recvbuf, recvbuflen, 0); //Receiving from nextNode
+                iSendResult = send(ClientSocket, recvbuf, recvbuflen, 0); //Sending back to prevNode immediately
+                if (iSendResult == SOCKET_ERROR) {
+                    printf("send failed: %d\n", WSAGetLastError());
+                    closesocket(ClientSocket);
+                    WSACleanup();
+                    return;
+                }
                 if (iResult > 0) {
-                    printf("Bytes received: %d\n", iResult);
-                    char chars[iResult + 1];
-                    memcpy(chars, recvbuf, iResult);
-                    chars[iResult] = '\0';
-                    result += chars;
+                    printf("Bytes received: %d. Bytes sent: %d\n", iResult, iSendResult);
+
                 }
                 else if (iResult == 0)
                     printf("Connection closed\n");
@@ -180,7 +174,6 @@ void Node::initialize_server_socket(const char *port_nr) {
                     printf("recv failed: %d\n", WSAGetLastError());
             } while (iResult > 0);
 
-            iSendResult = send(ClientSocket, result.c_str(), result.size(), 0); //Sender til client
             printf("final %d", iSendResult);
 
 
@@ -215,8 +208,6 @@ void Node::initialize_server_socket(const char *port_nr) {
     // cleanup
     closesocket(ClientSocket);
     WSACleanup();
-
-    return;
 }
 
 SOCKET Node::getSocket(const char *ip, const char *port) {
