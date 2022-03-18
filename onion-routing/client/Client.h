@@ -6,7 +6,6 @@
 #define IDATT2104___PROJECT___ONION_ROUTER_CLIENT_H
 
 
-#include "../key/Key.h"
 #include "../node/Node.h"
 
 class Client {

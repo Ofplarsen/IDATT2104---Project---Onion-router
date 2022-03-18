@@ -8,10 +8,8 @@
 
 class Crypter {
 public:
-    static int decrypt(int message, int key, int publicKey);
-    static unsigned long long int encrypt(int message, int key, int publicKey);
-
-    static int modInverse(int a, int m);
+    static int decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, unsigned char* text);
+    static int encrypt(unsigned char* text, int text_len, unsigned char* key, unsigned char* cipher);
 };
 
 

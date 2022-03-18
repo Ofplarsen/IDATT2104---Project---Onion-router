@@ -8,7 +8,7 @@
 
 #include <string>
 #include <winsock.h>
-#include "../key/Key.h"
+#include "../security/key/Key.h"
 
 using namespace std;
 
