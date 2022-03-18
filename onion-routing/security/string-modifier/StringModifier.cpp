@@ -40,3 +40,19 @@ unsigned char *StringModifier::convertToCharArray(std::string text) {
     return (unsigned char*) text.c_str();
 }
 
+std::vector<char> StringModifier::stringToCharVector(std::string str){
+    std::vector<char> writable(str.begin(), str.end());
+    writable.push_back('\0');
+    return writable;
+}
+
+std::vector<std::vector<char>> StringModifier::stringToCharArray(std::string str) {
+    std::vector<std::string> allStrings = splitString(str, 32);
+    std::vector<std::vector<char>> returnVector;
+    returnVector.reserve(allStrings.size());
+    for(auto & s : allStrings){
+        returnVector.emplace_back(stringToCharVector(s));
+    }
+
+    return returnVector;
+}

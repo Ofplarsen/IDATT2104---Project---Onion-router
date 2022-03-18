@@ -65,10 +65,16 @@ int main(int argc, char const *argv[]){
     unsigned char* key = (unsigned char*)"1234567890123456";
 
     unsigned char* key2 = (unsigned char*)"1234567890123457";
-    std::string text = "My secret message is now longer";
+    std::string text = "My secret message is now longerr hello ";
+    vector<char> textAsChar = StringModifier::stringToCharVector(text);
+
+    vector<vector<char>> cha = StringModifier::stringToCharArray(text);
+
+
+
     vector<int> t;
 
-    Cryption cryption(StringModifier::splitString(text, 32));
+    Cryption cryption(cha);
 
     //int text_len = strlen((const char*)text);
     //unsigned char cipher[64];
@@ -77,11 +83,11 @@ int main(int argc, char const *argv[]){
 
     //int cipher_len = Crypter::encrypt(text, text_len, key, cipher);
     Crypter c;
-    Cryption enc = c.encryptString(cryption, 1234567890123456);
+    vector<unsigned char*> enc = c.encryptString(cryption, 1234567890123456);
 
-    for(int i = 0; i < enc.getStrings().size(); i++){
-        for(int y = 0; y < enc.getStringsLen()[y]; y++){
-            printf("%02x ", enc.getStrings()[i][y]);
+    for(int i = 0; i < enc.size(); i++){
+        for(int y = 0; y < 32; y++){
+            printf("%02x ", enc[i][y]);
         }
     }
 
