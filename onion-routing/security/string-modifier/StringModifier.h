@@ -8,6 +8,8 @@
 
 #include <string>
 #include "vector"
+#include "../model/Cryption.h"
+
 class StringModifier {
 public:
     static unsigned char* convertToCharArray(long long int a);
@@ -15,8 +17,7 @@ public:
     static unsigned char* convertToCharArray(std::string text);
     static std::vector<char> stringToCharVector(std::string str);
     static std::vector<std::vector<char>> stringToCharArray(std::string str);
-
-    const unsigned char *convert(const std::string &s);
+    static std::string cryptionToString(Cryption &cryption);
 };
 
 

@@ -8,10 +8,10 @@
 using namespace std;
 
 unsigned long long int SC::power(long long int a, long long int b,
-        long long int P){
+        long long int p){
     if(b == 1)
         return a;
-    return (((long long int) pow(a,b)) % P);
+    return (((long long int) pow(a,b)) % p);
 };
 
 bool SC::isPrime(long long int number){

@@ -55,3 +55,14 @@ std::vector<std::vector<char>> StringModifier::stringToCharArray(std::string str
 
     return returnVector;
 }
+
+std::string StringModifier::cryptionToString(Cryption &cryption) {
+
+    string returnString;
+    for(int i = 0; i < cryption.getRes().size(); i++){
+        for(int y = 0; y < cryption.getStringsLen()[i]; y++){
+            returnString += cryption.getRes()[i][y];
+        }
+    }
+    return returnString;
+}

@@ -39,13 +39,14 @@ unsigned char* convertToCharArray(long long int a)
 }
 
 
-
+#define P 1786534726771898
+#define G 1234567890123
 int main(int argc, char const *argv[]){
     SC::initRandom();
     Key annaKey;
     Key bobKey;
-    long long int publicKey = SC::generatePublicKey();
-    long long int primitiveRoot = SC::findPrimitiveRoot(publicKey);
+    long long int publicKey = P;
+    long long int primitiveRoot = G;
     annaKey.setPublicKeyP(publicKey);
     annaKey.setPublicKeyG(primitiveRoot);
     bobKey.setPublicKeyP(publicKey);
@@ -54,60 +55,67 @@ int main(int argc, char const *argv[]){
     cout << publicKey << endl;
     cout << primitiveRoot << endl;
 
-    annaKey.setPrivateKey(2354);
-    bobKey.setPrivateKey(13132);
-    unsigned long long int secretKey = annaKey.getSecretKey(bobKey.generateKey());
+    annaKey.setPrivateKey(1786534726771898);
+    bobKey.setPrivateKey(1786534726771898);
+    unsigned long long int secretKey1 = annaKey.getSecretKey(bobKey.generateKey());
+    long long int secretKey = secretKey1 / 10000;
+    cout << secretKey1 << endl;
     cout << secretKey << endl;
-    secretKey = secretKey / 10000;
-    cout << secretKey << endl;
-    string textTest = "This is a longer message lol please";
-    //unsigned char* key = convertToCharArray(secretKey);
-    unsigned char* key = (unsigned char*)"1234567890123456";
+    //std::string text = "hello please work. I hate debugging :)))";
+    std::string text = "GET / HTTP/1.1\r\n"
+                       "Host: localhost:1250\r\n"
+                       "Connection: keep-alive\r\n"
+                       "Cache-Control: max-age=0\r\n"
+                       "sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"\r\n"
+                       "sec-ch-ua-mobile: ?0\r\n"
+                       "sec-ch-ua-platform: \"Windows\"\r\n"
+                       "Upgrade-Insecure-Requests: 1\r\n";
 
-    unsigned char* key2 = (unsigned char*)"1234567890123457";
-    std::string text = "My secret message a bit longer this is a very long test with different \r\n LOL";
-    vector<string> text1 = StringModifier::splitString(text, 32);
-    vector<char> textAsChar = StringModifier::stringToCharVector(text);
-
-    vector<vector<char>> cha = StringModifier::stringToCharArray(text);
-
-
-
-    vector<int> t;
-
-    Cryption cryption;
-    cryption.setTest(text);
-    //int text_len = strlen((const char*)text);
-    //unsigned char cipher[64];
-
-    //printf("cipher=\n");
-
-    //int cipher_len = Crypter::encrypt(text, text_len, key, cipher);
-
-    Cryption enc = Crypter::encryptString(text1, 1234567890123456);
-
+    Cryption enc = Crypter::encrypt(text, 1234567890123456);
+    string encrypted;
     for(int i = 0; i < enc.getRes().size(); i++){
-        for(int y = 0; y < 32; y++){
-             printf ("%02x ", enc.getRes()[i][y]);
+
+        for(int y = 0; y < enc.strings_len[i]; y++){
+            encrypted += enc.getRes()[i][y];
         }
     }
+    cout << encrypted << endl;
 
-    Cryption dec = Crypter::decryptString(enc, 1234567890123456);
-//
+    Cryption dec = Crypter::decrypt(enc, 1234567890123456);
+    string decrypted;
     for(int i = 0; i < dec.getRes().size(); i++){
-        for(int y = 0; y < 32; y++){
-            printf("%c ", dec.getRes()[i][y]);
+        for(int y = 0; y < dec.strings_len[i]; y++){
+            decrypted += dec.getRes()[i][y];
         }
     }
-    /*
-    printf("decrypted = \n");
-    unsigned char decrypted[64];
-    int dec_len = Crypter::decrypt(cipher2, cipher2_len, key2,decrypted);
-    for(int i = 0; i < dec_len; i++){
-        printf("%c", (const char)decrypted[i]);
-    }
+    cout << decrypted << endl;
 
-     */
+//    Cryption cryption;
+//    cryption.setTest(text);
+//
+//    Cryption enc = Crypter::encryptString(text1, 1234567890123456);
+//    vector<string> str;
+//    for(int i = 0; i < enc.getRes().size(); i++){
+//        string encrypted;
+//        for(int y = 0; y < enc.strings_len[i]; y++){
+//            encrypted += enc.getRes()[i][y];
+//        }
+//        str.push_back(encrypted);
+//    }
 
-    return 0;
+    //Node n;
+
+    //cout << encrypted << endl;
+
+    //vector<string> str = StringModifier::splitString(encrypted, 32);
+
+//    Cryption dec = Crypter::decryptString(str, enc.strings_len,1234567890123456);
+//    string decrypted;
+//    for(int i = 0; i < dec.getRes().size(); i++){
+//        for(int y = 0; y < dec.strings_len[i]; y++){
+//            decrypted += dec.getRes()[i][y];
+//        }
+//    }
+//    cout << decrypted << endl;
+//    return 0;
 }
