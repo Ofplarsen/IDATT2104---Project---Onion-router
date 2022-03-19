@@ -10,7 +10,7 @@
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
-void Node::initialize_server_socket(const char *port_nr) {
+void Node::initialize_server_socket(const char *port_nr, const char *next_node_port) {
 
     SOCKET ListenSocket = getListenSocket(port_nr); //Making a socket listen on given port
 
@@ -46,40 +46,10 @@ void Node::initialize_server_socket(const char *port_nr) {
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
         cout << "Received from prev: " << initial_user_req << "\n" << endl;
 
-        //Extracting domain name and path in user request. Test webpage input www.softwareqatest.com/qatfaq2.html
-        int spaces_until_sep;
-        int first_ln_len = 0;
-        for(; initial_user_req[first_ln_len] != '\r'; first_ln_len++){ //Finding end of first line
-            if(initial_user_req[first_ln_len] == '|') spaces_until_sep = first_ln_len; //Finding position of separator
-        }
-        int domain_length = stoi(initial_user_req.substr(0, spaces_until_sep));
-        int path_length = stoi(initial_user_req.substr(spaces_until_sep + 1, first_ln_len - spaces_until_sep + 1));
-        if(path_length == 0) path_length = -1;
-
-        cout << "Domain length: " <<domain_length << " Path length: " << path_length << endl;
-
-        string domain_name = initial_user_req.substr(29 + path_length, domain_length); //TODO needs polishing, not very dynamic
-        cout << domain_name << endl;
-
-        initial_user_req = initial_user_req.substr(first_ln_len+2, initial_user_req.length()); //Removing first line of request, redundant
-        cout << initial_user_req << endl;
-
-        //getting IP address from domain sent in by user
-        hostent *webDomain = gethostbyname(domain_name.c_str());
-        in_addr *addr; //To get  char  version of ip: inet_ntoa(*addr)
-        for(int i = 0; ; ++i) //Purposefully left the second condition out, because we will be testing for it inside the loop.
-        {
-            char *temp = webDomain->h_addr_list[i];
-            if(temp == NULL) //we reached the end of the list
-                break; //exit the loop.
-
-            addr = reinterpret_cast<in_addr*>(temp);
-        }
-
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET web_page_socket = getConnectSocket(inet_ntoa(*addr), "80"); //HTTP listens on port 80
+            SOCKET web_page_socket = getConnectSocket("192.168.1.14", next_node_port); //TODO needs fix, ip MUST be more dynamic
             iSendResult = send(web_page_socket, initial_user_req.c_str(), initial_user_req.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());
