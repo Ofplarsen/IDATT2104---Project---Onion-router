@@ -30,7 +30,6 @@ void InputNode::initialize_server_socket(const char *port_nr) {
     int iSendResult;
     int iStart;
     string initial_user_req;
-    string user_url;
 
     // Receive until the peer shuts down the connection
     do {
@@ -42,23 +41,12 @@ void InputNode::initialize_server_socket(const char *port_nr) {
         iResult = iStart;
 
         //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
-        vector<string> parsed = parse_initial_request(initial_user_req);
+        vector<string> parsed = parse_initial_request(initial_user_req); //Contains domain_name and path
 
         //constructing a get request that the node will send to socket on internet
         const char *get_req_ptr = construct_get_request(parsed.at(0), parsed.at(1)).c_str();
         std::cout << get_req_ptr << std::endl;
 
-        //getting IP address from domain sent in by user
-        /*hostent *webDomain = gethostbyname(domain_name.c_str());
-        in_addr *addr; //To get  char  version of ip: inet_ntoa(*addr)
-        for(int i = 0; ; ++i) //Purposefully left the second condition out, because we will be testing for it inside the loop.
-        {
-            char *temp = webDomain->h_addr_list[i];
-            if(temp == NULL) //we reached the end of the list
-                break; //exit the loop.
-
-            addr = reinterpret_cast<in_addr*>(temp);
-        }*/
 
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
@@ -207,8 +195,8 @@ vector<string> InputNode::parse_initial_request(string req) {
     return domain_and_path;
 }
 
-string InputNode::construct_get_request(string domain_name, string path) { //Constructs a modified GET request where the first line is the length of the path and domain separated by |
-    string get_req = to_string(path.length()) + "|" + to_string(domain_name.length()) + "\r\n" +
+string InputNode::construct_get_request(string domain_name, string path) { //Constructs a modified GET request where the first line is the length of the domain and path separated by |
+    string get_req = to_string(domain_name.length())+ "|" + to_string(path.length()) + "\r\n" +
             "GET /" + path + " HTTP/1.1\r\nHost: " + domain_name +
             "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\nConnection: close\r\n\r\n";
     return get_req;

@@ -85,40 +85,38 @@ void Node::initialize_server_socket(const char *port_nr) {
     int iSendResult;
     int iStart;
     string initial_user_req;
-    string user_url;
 
     // Receive until the peer shuts down the connection
     do {
         do {
-        iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
+        iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
         printf("Bytes received: %d\n", iStart);
-        initial_user_req += string(recvbuf).substr(0, iStart);
+        initial_user_req += string(recvbuf).substr(0, iStart); //Gathering user request in a string
         cout << recvbuf << endl << endl;
         iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
         cout << "Received from prev: " << initial_user_req << "\n" << endl;
 
-        //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
-        int user_arg_end;
+        //Extracting domain name and path in user request. Test webpage input www.softwareqatest.com/qatfaq2.html
         bool contains_path = false;
-        int path_length = 0;
-        string path;
-        for(user_arg_end = 5; initial_user_req[user_arg_end] != ' '; user_arg_end++){
-            if(initial_user_req[user_arg_end] == '/') contains_path = true;
-            if(contains_path) path_length++;
+        int spaces_until_sep;
+        int first_ln_len = 0;
+        for(; initial_user_req[first_ln_len] != '\r'; first_ln_len++){ //Finding end of first line
+            if(initial_user_req[first_ln_len] == '|') spaces_until_sep = first_ln_len; //Finding position of separator
         }
-        string domain_name = initial_user_req.substr(5, user_arg_end - 5 - path_length); //Domain name always starts at position 5 in get request, then goes up to the length of the entire URL - path size - offset
-        if(contains_path) path = initial_user_req.substr(1 + user_arg_end - path_length, path_length - 1); //Path starts right after /, therefore +1
+        int domain_length = stoi(initial_user_req.substr(0, spaces_until_sep));
+        int path_length = stoi(initial_user_req.substr(spaces_until_sep + 1, first_ln_len - spaces_until_sep + 1));
+        if(spaces_until_sep != first_ln_len) contains_path = true;
 
-        //constructing a get request that the node will send to socket on internet
-        //TODO memory????????qatlnks1.html
-        const char *get_req_pre_pre = "GET /";
-        const char *get_req_pre = " HTTP/1.1\r\nHost: ";
-        const char *get_req_post = "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\nConnection: close\r\n\r\n";
-        string get_req = get_req_pre_pre + path + get_req_pre + domain_name + get_req_post;
-        const char *get_req_ptr = get_req.c_str();
-        std::cout << get_req << std::endl;
-        //TODO memory????????
+        cout << "Domain length: " <<domain_length << " Path length: " << path_length << endl;
+
+        string domain_name = initial_user_req.substr(29 + path_length, domain_length); //TODO needs polishing, not very dynamic
+        string path;
+        if(contains_path) path = initial_user_req.substr(12, path_length); //TODO needs polishing, not very dynamic. Do I even have to find this?
+        cout << domain_name << path << endl;
+
+        initial_user_req = initial_user_req.substr(first_ln_len+2, initial_user_req.length());
+        cout << initial_user_req << endl;
 
         //getting IP address from domain sent in by user
         hostent *webDomain = gethostbyname(domain_name.c_str());
@@ -136,7 +134,7 @@ void Node::initialize_server_socket(const char *port_nr) {
             printf("Bytes received: %d\n", iResult);
 
             SOCKET web_page_socket = getSocket(inet_ntoa(*addr), "80");
-            iSendResult = send(web_page_socket, get_req_ptr, (int) strlen(get_req_ptr), 0); //forwarding received message to next/server
+            iSendResult = send(web_page_socket, initial_user_req.c_str(), initial_user_req.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
