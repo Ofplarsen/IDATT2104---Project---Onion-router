@@ -9,7 +9,9 @@
 #include <string>
 #include "vector"
 #include "../model/Cryption.h"
-
+/**
+ * Class used for modifying strings
+ */
 class StringModifier {
 public:
     static unsigned char* convertToCharArray(long long int a);

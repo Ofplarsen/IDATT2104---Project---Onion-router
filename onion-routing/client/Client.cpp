@@ -3,3 +3,7 @@
 //
 
 #include "Client.h"
+
+void generateKeys(){
+
+}

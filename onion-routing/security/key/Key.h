@@ -5,7 +5,9 @@
 #ifndef IDATT2104___PROJECT___ONION_ROUTER_KEY_H
 #define IDATT2104___PROJECT___ONION_ROUTER_KEY_H
 
-
+/**
+ * Class that hold public, private, gen, and secret keys for node
+ */
 class Key {
 private:
     unsigned long long int privateKey;
@@ -16,6 +18,8 @@ private:
 
 
 public:
+    Key();
+
     unsigned long long int generateKey();
     unsigned long long int getSecretKey(long long int generatedKey);
 

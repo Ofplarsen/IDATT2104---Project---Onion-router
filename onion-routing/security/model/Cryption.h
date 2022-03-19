@@ -9,11 +9,20 @@
 #include <vector>
 #include <string>
 using namespace std;
+/**
+ * Class for holding string data when encrypting/decrypting
+ */
 class Cryption {
 private:
 
 public:
+    /**
+     * Used to determine original length of string that is encrypted
+     */
     vector<int> strings_len;
+    /**
+     * Holds encrypted/decrypted string
+     */
     vector <unsigned char*> res;
 
     //Cryption(const vector <string> &strings);

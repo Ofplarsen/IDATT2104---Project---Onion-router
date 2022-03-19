@@ -5,17 +5,15 @@
 #ifndef IDATT2104___PROJECT___ONION_ROUTER_CLIENT_H
 #define IDATT2104___PROJECT___ONION_ROUTER_CLIENT_H
 
-
+#include "vector"
 #include "../node/Node.h"
-
+using namespace std;
 class Client {
 private:
-    //Key keys[];
+    vector <Key> keys;
     Node node; //Byttes ut med socket
 public:
-    Client(int numberOfNode){
 
-    }
     void generateKeys(){
 
     }

@@ -10,7 +10,6 @@
 #define P 1786534726771898
 #define G 1234567890123
 int main(int argc, char const *argv[]){
-    SC::initRandom();
     Key annaKey;
     Key bobKey;
     long long int publicKey = P;
@@ -20,11 +19,9 @@ int main(int argc, char const *argv[]){
     bobKey.setPublicKeyP(publicKey);
     bobKey.setPublicKeyG(primitiveRoot);
 
-    cout << publicKey << endl;
-    cout << primitiveRoot << endl;
+    cout << annaKey.getPrivateKey() << endl;
+    cout << bobKey.getPrivateKey() << endl;
 
-    annaKey.setPrivateKey(1786534726771898);
-    bobKey.setPrivateKey(1786534726773214);
     unsigned long long int secretKey1 = annaKey.getSecretKey(bobKey.generateKey());
     long long int secretKey = secretKey1 / 10000;
     cout << secretKey1 << endl;

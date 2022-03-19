@@ -4,15 +4,16 @@
 #ifndef IDATT2104___PROJECT___ONION_ROUTER_SC_H
 #define IDATT2104___PROJECT___ONION_ROUTER_SC_H
 
-
+/**
+ * Class for generating parts of diffie Hellman handshake
+ */
 class SC{
     public:
 
         static unsigned long long int power(long long int a, long long int b,
                                                      long long int P);
-        static unsigned long long int generatePublicKey();
-        static unsigned long long int generatePublicKeyG(int n);
-    //private:
+        static unsigned long long int generatePrivateKey();
+    private:
         static bool isPrime(long long int number);
         static unsigned long long int getRandomPrime();
         static unsigned long long int powerG(int x, unsigned int y, int p);
