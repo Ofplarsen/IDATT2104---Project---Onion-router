@@ -29,7 +29,8 @@ public:
     void connect();
 
     void initialize_server_socket(const char *port_nr);
-    SOCKET getSocket(const char *ip, const char *port);
+    SOCKET getConnectSocket(const char *ip, const char *port);
+    SOCKET getListenSocket(const char *port_nr);
 };
 
 

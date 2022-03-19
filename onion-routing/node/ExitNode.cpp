@@ -147,6 +147,7 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
 
     // Accept a client socket
     ClientSocket = accept(ListenSocket, NULL, NULL);
+    cout << "PrevSocket connected" << endl;
     if (ClientSocket == INVALID_SOCKET) {
         printf("accept failed: %d\n", WSAGetLastError());
         closesocket(ListenSocket);
@@ -155,32 +156,42 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
     }
 
 #define DEFAULT_BUFLEN 512
+
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
-    int iResult;
     int iSendResult;
     int iStart;
     string initial_user_req;
-    string user_url;
 
     // Receive until the peer shuts down the connection
     do {
         do {
-            iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
+            iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
             printf("Bytes received: %d\n", iStart);
-            initial_user_req += string(recvbuf).substr(0, iStart);
+            initial_user_req += string(recvbuf).substr(0, iStart); //Gathering user request in a string
+            cout << recvbuf << endl << endl;
+            iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
-        iResult = iStart;
+        cout << "Received from prev: " << initial_user_req << "\n" << endl;
 
-        //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
-        vector<string> parsed = parse_initial_request(initial_user_req);
+        //Extracting domain name and path in user request. Test webpage input www.softwareqatest.com/qatfaq2.html
+        int spaces_until_sep;
+        int first_ln_len = 0;
+        for(; initial_user_req[first_ln_len] != '\r'; first_ln_len++){ //Finding end of first line
+            if(initial_user_req[first_ln_len] == '|') spaces_until_sep = first_ln_len; //Finding position of separator
+        }
+        int domain_length = stoi(initial_user_req.substr(0, spaces_until_sep));
+        int path_length = stoi(initial_user_req.substr(spaces_until_sep + 1, first_ln_len - spaces_until_sep + 1));
+        if(path_length == 0) path_length = -1;
 
-        //constructing a get request that the node will send to socket on internet
-        const char *get_req_ptr = construct_get_request(parsed.at(0), parsed.at(1)).c_str();
-        std::cout << get_req_ptr << std::endl;
+        cout << "Domain length: " <<domain_length << " Path length: " << path_length << endl;
+
+        string domain_name = initial_user_req.substr(29 + path_length, domain_length); //TODO needs polishing, not very dynamic
+
+        initial_user_req = initial_user_req.substr(first_ln_len+2, initial_user_req.length()); //Removing first line of request, redundant
 
         //getting IP address from domain sent in by user
-        /*hostent *webDomain = gethostbyname(domain_name.c_str());
+        hostent *webDomain = gethostbyname(domain_name.c_str());
         in_addr *addr; //To get  char  version of ip: inet_ntoa(*addr)
         for(int i = 0; ; ++i) //Purposefully left the second condition out, because we will be testing for it inside the loop.
         {
@@ -189,14 +200,13 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
                 break; //exit the loop.
 
             addr = reinterpret_cast<in_addr*>(temp);
-        }*/
+        }
 
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET web_page_socket = getConnectSocket("192.168.1.14", "8080"); //TODO fix here to change which connection to forward to
-            cout << "connected to next, trying to send" << endl;
-            iSendResult = send(web_page_socket, get_req_ptr, (int) strlen(get_req_ptr), 0); //forwarding received message to next/server
+            SOCKET web_page_socket = getConnectSocket(inet_ntoa(*addr), "80"); //HTTP listens on port 80
+            iSendResult = send(web_page_socket, initial_user_req.c_str(), initial_user_req.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
@@ -318,31 +328,6 @@ SOCKET ExitNode::getConnectSocket(const char *ip, const char *port) {
     }
 
     return ConnectSocket;
-}
-
-vector<string> ExitNode::parse_initial_request(string req) {
-    int user_arg_end;
-    bool contains_path = false;
-    int path_length = 0;
-    string path;
-    for(user_arg_end = 5; req[user_arg_end] != ' '; user_arg_end++){
-        if(req[user_arg_end] == '/') contains_path = true;
-        if(contains_path) path_length++;
-    }
-    string domain_name = req.substr(5, user_arg_end - 5 - path_length); //Domain name always starts at position 5 in get request, then goes up to the length of the entire URL - path size - offset
-    if(contains_path) path = req.substr(1 + user_arg_end - path_length, path_length - 1); //Path starts right after /, therefore +1
-
-    vector<string> domain_and_path(2);
-    domain_and_path.at(0) = domain_name;
-    domain_and_path.at(1) = path;
-    return domain_and_path;
-}
-
-string ExitNode::construct_get_request(string domain_name, string path) { //Constructs a modified GET request where the first line is the length of the path and domain separated by |
-    string get_req = to_string(path.length()) + "|" + to_string(domain_name.length()) + "\r\n" +
-                     "GET /" + path + " HTTP/1.1\r\nHost: " + domain_name +
-                     "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\nConnection: close\r\n\r\n";
-    return get_req;
 }
 
 SOCKET ExitNode::getListenSocket(const char *port_nr) {

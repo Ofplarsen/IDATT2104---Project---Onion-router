@@ -30,11 +30,8 @@ public:
 
     SOCKET getListenSocket(const char *nr);
 
-    string construct_get_request(string domain_name, string path);
 
     SOCKET getConnectSocket(const char *ip, const char *port);
-
-    vector<string> parse_initial_request(string req);
 };
 
 
