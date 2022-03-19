@@ -13,19 +13,13 @@ class Cryption {
 private:
 
 public:
-    vector <vector<char>> strings;
     vector<int> strings_len;
     vector <unsigned char*> res;
-    string test;
-    Cryption(vector<unsigned char *> *strings, initializer_list<int> stringsLen);
 
     //Cryption(const vector <string> &strings);
 
-    const vector <vector<char>> &getStrings() const;
-
     const vector<int> &getStringsLen() const;
 
-    Cryption(vector <vector<char>> vector1);
 
     Cryption(vector <unsigned char*>  vector1, vector<int> stringsLen);
 
@@ -33,13 +27,6 @@ public:
 
     vector<unsigned char *> getRes();
 
-    string &getTest() const;
-
-    void setTest(string &test);
-
-    string &getTest();
-
-    void setStrings(const vector<vector<char>> &strings);
 
     void setStringsLen(const vector<int> &stringsLen);
 

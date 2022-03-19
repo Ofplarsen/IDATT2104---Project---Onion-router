@@ -3,14 +3,13 @@
 //
 #include <cmath>
 #include <openssl/evp.h>
-#include <openssl/err.h>
 #include <openssl/bio.h>
 #include <cstring>
-#include <iostream>
 #include <utility>
 #include "../string-modifier/StringModifier.h"
 #include "Crypter.h"
 #include "../model/Cryption.h"
+
 #define BLOCK_SIZE 32
 int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, unsigned char* text){
     int text_len = 0;

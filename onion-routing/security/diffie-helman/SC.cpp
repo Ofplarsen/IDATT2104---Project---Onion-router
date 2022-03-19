@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <math.h>
+
+#include <cmath>
 #include <ctime>
 #include <bits/stdc++.h>
 #include "SC.h"
-#include <random>
+
 
 using namespace std;
 
