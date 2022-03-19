@@ -42,7 +42,6 @@ unsigned char *StringModifier::convertToCharArray(std::string text) {
 
 std::vector<char> StringModifier::stringToCharVector(std::string str){
     std::vector<char> writable(str.begin(), str.end());
-    writable.push_back('\0');
     return writable;
 }
 

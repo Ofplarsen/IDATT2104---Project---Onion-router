@@ -13,8 +13,16 @@ class Crypter {
 public:
     static int decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, unsigned char* text);
     static int encrypt(unsigned char* text, int text_len, unsigned char* key, unsigned char* cipher);
-    std::vector<unsigned char*> encryptString(Cryption cryption, long long int key);
-    static Cryption decryptString(Cryption cryption, long long int key);
+    std::vector<unsigned char*> encryptString(string text, long long int key);
+    //static Cryption decryptString(Cryption cryption, long long int key);
+
+    static Cryption encryptString(vector<string> strings, long long int key);
+
+    static Cryption decryptString(Cryption &cryption, long long int key);
+
+    static void encryptString(vector<string> strings, long long int key, Cryption & c);
+
+    //Cryption encryptString(vector<string> strings, long long int key, Cryption &c);
 };
 
 

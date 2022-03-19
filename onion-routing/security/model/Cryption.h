@@ -11,11 +11,13 @@
 using namespace std;
 class Cryption {
 private:
+
+public:
     vector <vector<char>> strings;
     vector<int> strings_len;
     vector <unsigned char*> res;
-public:
-    Cryption(vector <vector<char>> strings, vector<int> stringsLen);
+    string test;
+    Cryption(vector<unsigned char *> *strings, initializer_list<int> stringsLen);
 
     //Cryption(const vector <string> &strings);
 
@@ -29,7 +31,19 @@ public:
 
     Cryption();
 
-    const vector<unsigned char *> getRes() const;
+    vector<unsigned char *> getRes();
+
+    string &getTest() const;
+
+    void setTest(string &test);
+
+    string &getTest();
+
+    void setStrings(const vector<vector<char>> &strings);
+
+    void setStringsLen(const vector<int> &stringsLen);
+
+    void setRes(const vector<unsigned char *> &res);
 };
 
 

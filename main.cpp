@@ -60,12 +60,13 @@ int main(int argc, char const *argv[]){
     cout << secretKey << endl;
     secretKey = secretKey / 10000;
     cout << secretKey << endl;
-    string textTest = "This is a longer messa";
+    string textTest = "This is a longer message lol please";
     //unsigned char* key = convertToCharArray(secretKey);
     unsigned char* key = (unsigned char*)"1234567890123456";
 
     unsigned char* key2 = (unsigned char*)"1234567890123457";
-    std::string text = "My secret message is now longerr hello ";
+    std::string text = "My secret message a bit longer this is a very long test with different \r\n LOL";
+    vector<string> text1 = StringModifier::splitString(text, 32);
     vector<char> textAsChar = StringModifier::stringToCharVector(text);
 
     vector<vector<char>> cha = StringModifier::stringToCharArray(text);
@@ -74,23 +75,30 @@ int main(int argc, char const *argv[]){
 
     vector<int> t;
 
-    Cryption cryption(cha);
-
+    Cryption cryption;
+    cryption.setTest(text);
     //int text_len = strlen((const char*)text);
     //unsigned char cipher[64];
 
     //printf("cipher=\n");
 
     //int cipher_len = Crypter::encrypt(text, text_len, key, cipher);
-    Crypter c;
-    vector<unsigned char*> enc = c.encryptString(cryption, 1234567890123456);
 
-    for(int i = 0; i < enc.size(); i++){
+    Cryption enc = Crypter::encryptString(text1, 1234567890123456);
+
+    for(int i = 0; i < enc.getRes().size(); i++){
         for(int y = 0; y < 32; y++){
-            printf("%02x ", enc[i][y]);
+             printf ("%02x ", enc.getRes()[i][y]);
         }
     }
 
+    Cryption dec = Crypter::decryptString(enc, 1234567890123456);
+//
+    for(int i = 0; i < dec.getRes().size(); i++){
+        for(int y = 0; y < 32; y++){
+            printf("%c ", dec.getRes()[i][y]);
+        }
+    }
     /*
     printf("decrypted = \n");
     unsigned char decrypted[64];

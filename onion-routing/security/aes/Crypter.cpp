@@ -6,6 +6,7 @@
 #include <openssl/err.h>
 #include <openssl/bio.h>
 #include <cstring>
+#include <iostream>
 #include "../string-modifier/StringModifier.h"
 #include "Crypter.h"
 #include "../model/Cryption.h"
@@ -78,55 +79,61 @@ int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsi
     return cipher_len;
 }
 
-vector<unsigned char*> Crypter::encryptString(Cryption cryption,long long int key) {
+Cryption Crypter::encryptString(vector<string> strings, long long int key) {
 
     //std::vector<std::string> strings = StringModifier::splitString(text, 32);
-
     vector<unsigned char*> returnValue;
     std::vector<int> returnLengths;
-    for(auto & string : cryption.getStrings()){
-        auto* temp = (unsigned char *) &string[0];
+    Cryption c;
+    for(int i = 0; i < strings.size(); i++){
+        unsigned char* temp;
+        temp = (unsigned char*)( strings[i].c_str());
+        vector <unsigned char> test;
+
         unsigned char encrypted[64];
+        memset(encrypted, 0, 64);
         std::string keyd = std::to_string(key);
         int encrypted_len = encrypt(temp, strlen((const char*)(temp)), StringModifier::convertToCharArray(std::to_string(key)), encrypted);
 
-        returnLengths.emplace_back(encrypted_len);
-        returnValue.emplace_back(encrypted);
+        char * copy = static_cast<char *>(malloc(encrypted_len));
+        strcpy(copy, reinterpret_cast<const char *>(encrypted));
+
+        c.strings_len.push_back(encrypted_len);
+        c.res.push_back(reinterpret_cast<unsigned char *const>(copy));
     }
 
-    for(int i = 0; i < returnValue.size(); i++){
-        for(int y = 0; y < returnLengths[i]; y++){
-            printf("%02x ", returnValue[i][y]);
-        }
-    }
+//    for(int i = 0; i < returnValue.size(); i++){
+//        for(int y = 0; y < returnLengths[i]; y++){
+//            printf("%02x ", returnValue[i][y]);
+//        }
+//    }
 
-    decryptString(Cryption(returnValue, returnLengths), key);
-
-    return returnValue;//Cryption(returnValue, returnLengths);
+    return c;
 }
 
-Cryption Crypter::decryptString(Cryption cryption, long long int key) {
+Cryption Crypter::decryptString(Cryption& cryption, long long int key) {
 
     std::vector<unsigned char*> returnValue;
     std::vector<int> returnLengths;
 
-    for(auto & string : cryption.getRes()){
-        auto* temp = (unsigned char *) &string[0];
+    for(int i = 0; i < cryption.getRes().size(); i++){
+        auto* temp = (unsigned char *) cryption.getRes()[i];
         unsigned char decrypted[64];
-        int dec_len = decrypt(temp, strlen((const char*)(temp)), StringModifier::convertToCharArray(std::to_string(key)), decrypted);
+        memset(decrypted, 0, 64);
+        int dec_len = decrypt(temp, cryption.getStringsLen()[i], StringModifier::convertToCharArray(std::to_string(key)), decrypted);
+
+
+        char * copy = static_cast<char *>(malloc(cryption.getStringsLen()[i]));
+        strcpy(copy, reinterpret_cast<const char *>(decrypted));
 
         returnLengths.emplace_back(dec_len);
-        returnValue.emplace_back((decrypted));
+        returnValue.emplace_back(reinterpret_cast<unsigned char *const>(copy));
     }
 
-    for(int i = 0; i < returnValue.size(); i++){
-        for(int y = 0; y < returnLengths[i]; y++){
-            printf("%c ", (const char)returnValue[i][y]);
-        }
-    }
+    Cryption c;
+    c.setRes(returnValue);
+    c.setStringsLen(returnLengths);
 
-
-    return Cryption();
+    return c;
 }
-
 
