@@ -28,8 +28,9 @@ public:
     void receive_message(string message);
     void connect();
 
-    void initialize_server_socket(const char *port_nr);
-    SOCKET getSocket(const char *ip, const char *port);
+    void initialize_server_socket(const char *port_nr, const char *next_node_port);
+    SOCKET getConnectSocket(const char *ip, const char *port);
+    SOCKET getListenSocket(const char *port_nr);
 };
 
 

@@ -7,9 +7,20 @@
 
 
 #include "Node.h"
+#include <string>
+#include <vector>
+#include <winsock.h>
+
+using namespace std;
+
 
 class InputNode: public Node{
-
+public:
+    void initialize_server_socket(const char *port_nr);
+    SOCKET getConnectSocket(const char *ip, const char *port);
+    SOCKET getListenSocket(const char *port_nr);
+    vector<string> parse_initial_request(string req);
+    string construct_get_request(string domain_name, string path);
 };
 
 

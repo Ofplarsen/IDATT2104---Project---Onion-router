@@ -16,6 +16,8 @@
 #define PORT 8080
 
 #include "Node.h"
+#include <vector>
+
 
 class ExitNode : public Node{
 private:
@@ -23,6 +25,13 @@ private:
 
 public:
     void sendGetRequest(const char *ip, const char *port);
+
+    void initialize_server_socket(const char *port_nr);
+
+    SOCKET getListenSocket(const char *nr);
+
+
+    SOCKET getConnectSocket(const char *ip, const char *port);
 };
 
 
