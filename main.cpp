@@ -18,11 +18,12 @@ int main(int argc, char const *argv[])
     ExitNode exn1;
     InputNode inp1;
     n1.nextNode = &exn1;
-    const char *ptr = "8081";
-    inp1.initialize_server_socket(ptr);
-    //std::thread t1(inp1.initialize_server_socket, ptr);
-    n1.initialize_server_socket("8080");
+    //inp1.initialize_server_socket(8081);
+    std::thread t1(&InputNode::initialize_server_socket, &inp1, "8081");
+    std::thread t2(&Node::initialize_server_socket, &n1, "8080");
+    //n1.initialize_server_socket("8080");
 
-
+    t1.join();
+    t2.join();
     return 0;
 }

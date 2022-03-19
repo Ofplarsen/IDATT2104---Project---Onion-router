@@ -9,60 +9,8 @@
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
 void InputNode::initialize_server_socket(const char *port_nr) {
-    WSAData wsaData;
-    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-    std::cout << "Initializing winosck..." << std::endl;
-    if (iResult != 0) {
-        std::cout << "Something went wrong " << WSAGetLastError() << std::endl;
-        return;
-    }
-
-    struct addrinfo *result = NULL, *ptr = NULL, hints;
-
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = AI_PASSIVE;
-
-    // Resolve the local address and port to be used by the server
-    iResult = getaddrinfo(NULL, port_nr, &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed: %d\n", iResult);
-        WSACleanup();
-        return;
-    }
-
-    SOCKET ListenSocket = INVALID_SOCKET;
-
-    // Create a SOCKET for the server to listen for client connections
-    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (ListenSocket == INVALID_SOCKET) {
-        printf("Error at socket(): %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return;
-    }
-
-    // Setup the TCP listening socket
-    iResult = bind(ListenSocket, result->ai_addr, (int) result->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        printf("bind failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(result);
-        closesocket(ListenSocket);
-        WSACleanup();
-        return;
-    }
-
-    freeaddrinfo(result);
-
-    if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR ) {
-        printf( "Listen failed with error: %ld\n", WSAGetLastError() );
-        closesocket(ListenSocket);
-        WSACleanup();
-        return;
-    }
+    SOCKET ListenSocket = getListenSocket(port_nr); //Making a socket listen on given port
 
     SOCKET ClientSocket = INVALID_SOCKET;
 
@@ -75,10 +23,10 @@ void InputNode::initialize_server_socket(const char *port_nr) {
         return;
     }
 
-#define DEFAULT_BUFLEN 512
-
+    #define DEFAULT_BUFLEN 512
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
+    int iResult;
     int iSendResult;
     int iStart;
     string initial_user_req;
@@ -95,15 +43,13 @@ void InputNode::initialize_server_socket(const char *port_nr) {
 
         //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
         vector<string> parsed = parse_initial_request(initial_user_req);
-        string domain_name = parsed.at(0);
-        string path = parsed.at(1);
 
         //constructing a get request that the node will send to socket on internet
-        const char *get_req_ptr = construct_get_request(domain_name, path).c_str();
+        const char *get_req_ptr = construct_get_request(parsed.at(0), parsed.at(1)).c_str();
         std::cout << get_req_ptr << std::endl;
 
         //getting IP address from domain sent in by user
-        hostent *webDomain = gethostbyname(domain_name.c_str());
+        /*hostent *webDomain = gethostbyname(domain_name.c_str());
         in_addr *addr; //To get  char  version of ip: inet_ntoa(*addr)
         for(int i = 0; ; ++i) //Purposefully left the second condition out, because we will be testing for it inside the loop.
         {
@@ -112,12 +58,13 @@ void InputNode::initialize_server_socket(const char *port_nr) {
                 break; //exit the loop.
 
             addr = reinterpret_cast<in_addr*>(temp);
-        }
+        }*/
 
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET web_page_socket = getSocket("localhost", "8080");
+            SOCKET web_page_socket = getConnectSocket("192.168.1.14", "8080"); //TODO fix here to change which connection to forward to
+            cout << "connected to next, trying to send" << endl;
             iSendResult = send(web_page_socket, get_req_ptr, (int) strlen(get_req_ptr), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());
@@ -185,7 +132,7 @@ void InputNode::initialize_server_socket(const char *port_nr) {
     WSACleanup();
 }
 
-SOCKET InputNode::getSocket(const char *ip, const char *port) {
+SOCKET InputNode::getConnectSocket(const char *ip, const char *port) {
     WSADATA wsaData;
     int iResult;
 
@@ -260,12 +207,68 @@ vector<string> InputNode::parse_initial_request(string req) {
     return domain_and_path;
 }
 
-string InputNode::construct_get_request(string domain_name, string path) {
-    //TODO memory????????qatlnks1.html
-    const char *get_req_pre_pre = "GET /";
-    const char *get_req_pre = " HTTP/1.1\r\nHost: ";
-    const char *get_req_post = "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\nConnection: close\r\n\r\n";
-    string get_req = get_req_pre_pre + path + get_req_pre + domain_name + get_req_post;
-    //TODO memory????????
+string InputNode::construct_get_request(string domain_name, string path) { //Constructs a modified GET request where the first line is the length of the path and domain separated by |
+    string get_req = to_string(path.length()) + "|" + to_string(domain_name.length()) + "\r\n" +
+            "GET /" + path + " HTTP/1.1\r\nHost: " + domain_name +
+            "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\nConnection: close\r\n\r\n";
     return get_req;
+}
+
+SOCKET InputNode::getListenSocket(const char *port_nr) {
+    WSAData wsaData;
+    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+    std::cout << "Initializing winosck..." << std::endl;
+    if (iResult != 0) {
+        std::cout << "Something went wrong " << WSAGetLastError() << std::endl;
+        return NULL;
+    }
+
+    struct addrinfo *result = NULL, *ptr = NULL, hints;
+
+    ZeroMemory(&hints, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+    hints.ai_flags = AI_PASSIVE;
+
+    // Resolve the local address and port to be used by the server
+    iResult = getaddrinfo(NULL, port_nr, &hints, &result);
+    if (iResult != 0) {
+        printf("getaddrinfo failed: %d\n", iResult);
+        WSACleanup();
+        return NULL;
+    }
+
+    SOCKET ListenSocket = INVALID_SOCKET;
+
+    // Create a SOCKET for the server to listen for client connections
+    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (ListenSocket == INVALID_SOCKET) {
+        printf("Error at socket(): %ld\n", WSAGetLastError());
+        freeaddrinfo(result);
+        WSACleanup();
+        return NULL;
+    }
+
+    // Setup the TCP listening socket
+    iResult = bind(ListenSocket, result->ai_addr, (int) result->ai_addrlen);
+    if (iResult == SOCKET_ERROR) {
+        printf("bind failed with error: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        closesocket(ListenSocket);
+        WSACleanup();
+        return NULL;
+    }
+
+    freeaddrinfo(result);
+
+    if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR ) {
+        printf( "Listen failed with error: %ld\n", WSAGetLastError() );
+        closesocket(ListenSocket);
+        WSACleanup();
+        return NULL;
+    }
+
+    return ListenSocket;
 }

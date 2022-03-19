@@ -70,6 +70,7 @@ void Node::initialize_server_socket(const char *port_nr) {
 
     // Accept a client socket
     ClientSocket = accept(ListenSocket, NULL, NULL);
+    cout << "PrevSocket connected" << endl;
     if (ClientSocket == INVALID_SOCKET) {
         printf("accept failed: %d\n", WSAGetLastError());
         closesocket(ListenSocket);
@@ -92,8 +93,10 @@ void Node::initialize_server_socket(const char *port_nr) {
         iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
         printf("Bytes received: %d\n", iStart);
         initial_user_req += string(recvbuf).substr(0, iStart);
+        cout << recvbuf << endl << endl;
         iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
+        cout << "Received from prev: " << initial_user_req << "\n" << endl;
 
         //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
         int user_arg_end;
