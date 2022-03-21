@@ -13,9 +13,9 @@
 using namespace std;
 class MainServer {
 private:
-    vector <Node> nodePool;
-    vector <InputNode> inputNodePool;
-    vector <ExitNode> exitNodePool;
+    vector <InputNode> inputNodePool; //Amount: 5
+    vector <Node> nodePool; //Amount: 10
+    vector <ExitNode> exitNodePool; //Amount: 5
 
     SOCKET server; //Client connects to this one through browser
     SOCKET forward; //Used to forward information to Nodes
@@ -27,7 +27,10 @@ public:
 
     void generateKeys();
     int start();
-    string parseGetReq();
+    string parseGetReq(string req);
+    int getNodeAmount(int min, int max);
+    string welcome();
+    string help();
 };
 
 

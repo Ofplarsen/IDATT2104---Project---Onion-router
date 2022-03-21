@@ -1,4 +1,5 @@
 #include <iostream>
+#include "onion-routing/client/MainServer.h"
 #include "onion-routing/node/Node.h"
 #include "onion-routing/security/diffie-helman/SC.h"
 #include "onion-routing/security/aes/Crypter.h"
@@ -10,7 +11,10 @@
 #define P 1786534726771898
 #define G 1234567890123
 int main(int argc, char const *argv[]){
-    Key annaKey;
+    MainServer s;
+    s.start();
+
+    /*    Key annaKey;
     Key bobKey;
     long long int publicKey = P;
     long long int primitiveRoot = G;
@@ -53,5 +57,5 @@ int main(int argc, char const *argv[]){
             decrypted += dec.getRes()[i][y];
         }
     }
-    cout << decrypted << endl;
+    cout << decrypted << endl;*/
 }
