@@ -3,7 +3,10 @@
 #include <ctime>
 #include <bits/stdc++.h>
 #include "SC.h"
-#include "../big-int/BigInt.h"
+
+#include <stdio.h>
+#include <openssl/dh.h>
+#include <openssl/bn.h>
 
 
 using namespace std;
@@ -21,15 +24,12 @@ unsigned long long int SC::power(long long int a, long long int b,
     return (((unsigned long long int) pow(a,b)) % p);
 };
 
-BigInt SC::power(BigInt &a, BigInt &b,
-                 BigInt &p){
-    if(b == 1)
-        return a;
-    BigInt n;
-    n = a^b;
-    BigInt c;
-    c = n%p;
-    return c;
+BIGNUM * SC::power(BIGNUM *a, BIGNUM *b, BIGNUM *p){
+    BN_CTX *ctx = BN_CTX_new();
+    BIGNUM *returnValue = BN_new();
+    BN_mod_exp(returnValue, a, b, p, ctx);
+    BN_CTX_free(ctx);
+    return returnValue;
 };
 
 /**
@@ -37,40 +37,23 @@ BigInt SC::power(BigInt &a, BigInt &b,
  * @param number
  * @return
  */
-bool SC::isPrime(long long int number){
-    if (number == 0 || number == 1)
-            return false;
-
-    for (int i = 2; i <= number/2; ++i) {
-        if (number % i == 0) {
-            return false;
-        }
-
-    }
-
-    return true;
-};
 
 /**
  * Method that generates random number and adds 1 until it is prime
  * TODO optimise?
  * @return
  */
-unsigned long long int SC::getRandomPrime(){
-    long long int rndNumb;
-    for(int i = 0; i < 5; i++){
-        rndNumb = (rand() % 100000000);
-    }
-    while(!isPrime(rndNumb))
-        rndNumb += 1;
-    return rndNumb;
+BIGNUM * SC::getRandomPrime(){
+    BIGNUM *ret = BN_new();
+    BN_generate_prime_ex(ret, 144,1 ,NULL, NULL, NULL);
+    return ret;
 };
 
 /**
  * Method that has a cleaner name than randomPrime
  * @return
  */
-unsigned long long int SC::generatePrivateKey(){
+BIGNUM * SC::generatePrivateKey(){
     return getRandomPrime();
 };
 

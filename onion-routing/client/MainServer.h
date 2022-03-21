@@ -11,7 +11,7 @@
 using namespace std;
 class MainServer {
 private:
-    map<Node, Key> keys{};
+    vector<long long int> keys;
     Node node; //Byttes ut med socket
     vector<Node> userNodes;
 
@@ -19,6 +19,9 @@ private:
 
 public:
     MainServer();
+
+    const vector<Node> &getUserNodes() const;
+
 };
 
 

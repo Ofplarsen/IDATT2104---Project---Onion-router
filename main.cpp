@@ -14,8 +14,34 @@
 int main(int argc, char const *argv[]){
 
     MainServer main;
-    srand(time(0));
 
+    vector<Node> nodes = main.getUserNodes();
+
+    std::string text = "GET / HTTP/1.1\r\n"
+                       "Host: localhost:1250\r\n"
+                       "Connection: keep-alive\r\n"
+                       "Cache-Control: max-age=0\r\n"
+                       "sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"\r\n"
+                       "sec-ch-uadsadsadsa";
+
+    //Cryption enc = Crypter::encrypt(text, BN_get_word(nodes[0].decryptKey.getSecretKey1()));
+
+    Cryption enc = Crypter::encrypt(text,StringModifier::BN2LLI(nodes[0].decryptKey.secretKey));
+    string encrypted;
+    for(int i = 0; i < enc.getRes().size(); i++){
+        for(int y = 0; y < enc.strings_len[i]; y++){
+            encrypted += enc.getRes()[i][y];
+        }
+    }
+    // Cryption dec = Crypter::decrypt(enc, BN_get_word(nodes[1].encryptKey.getSecretKey1()));
+    Cryption dec = Crypter::decrypt(enc, StringModifier::BN2LLI(nodes[1].encryptKey.secretKey));
+    string decrypted;
+    for(int i = 0; i < dec.getRes().size(); i++){
+        for(int y = 0; y < dec.strings_len[i]; y++){
+            decrypted += dec.getRes()[i][y];
+        }
+    }
+    cout << decrypted << endl;
 
 //    Key annaKey;
 //    Key bobKey;

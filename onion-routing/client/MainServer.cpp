@@ -4,10 +4,13 @@
 
 #include "MainServer.h"
 #include "../security/diffie-helman/Handshake.h"
+#include "../security/string-modifier/StringModifier.h"
 bool MainServer::generateKeys(){
-    for(auto it = begin(userNodes); it != end(userNodes); it++){
-        Handshake::doHandshake(it->decryptKey, std::next(it)->encryptKey);
+    for(auto it = begin(userNodes); it != end(userNodes)-1; it++){
+        long long int num = StringModifier::BN2LLI(Handshake::doHandshake(it->decryptKey, std::next(it)->encryptKey));
+        keys.push_back(num);
     }
+
 }
 
 MainServer::MainServer() {
@@ -19,3 +22,8 @@ MainServer::MainServer() {
     userNodes.push_back(n3);
     generateKeys();
 }
+
+const vector<Node> &MainServer::getUserNodes() const {
+    return userNodes;
+}
+

@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <openssl/bn.h>
 #include "StringModifier.h"
 
 unsigned char* StringModifier::convertToCharArray(long long int a)
@@ -50,4 +51,27 @@ std::string StringModifier::cryptionToString(Cryption &cryption) {
         }
     }
     return returnString;
+}
+
+long long int StringModifier::BN2LLI(BIGNUM *num){
+    BIGNUM *dupNum;
+    dupNum = BN_dup(num);
+
+    char* charNum;
+
+    charNum = BN_bn2dec(dupNum);
+
+    string strNum = string(charNum);
+    return stoll(strNum, nullptr, 10);
+}
+
+string StringModifier::BN2Str(BIGNUM *num){
+    BIGNUM *dupNum;
+    dupNum = BN_dup(num);
+
+    char* charNum;
+
+    charNum = BN_bn2dec(dupNum);
+
+    return string(charNum);
 }
