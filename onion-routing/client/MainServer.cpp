@@ -17,9 +17,11 @@ MainServer::MainServer() {
     Node n1;
     Node n2;
     Node n3;
+    Node n4;
     userNodes.push_back(n1);
     userNodes.push_back(n2);
     userNodes.push_back(n3);
+    userNodes.push_back(n4);
     generateKeys();
 }
 

@@ -3,6 +3,9 @@
 //
 
 #include "Node.h"
+#include "../security/model/Cryption.h"
+#include "../security/aes/Crypter.h"
+#include "../security/string-modifier/StringModifier.h"
 #include <iostream>
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -231,4 +234,39 @@ SOCKET Node::getListenSocket(const char *port_nr){
     }
 
     return ListenSocket;
+}
+
+string Node::encrypt(string message) {
+    Cryption enc = Crypter::encrypt(message,StringModifier::BN2LLI(decryptKey.secretKey));
+    string encrypted;
+    for(int i = 0; i < enc.getRes().size(); i++){
+        for(int y = 0; y < enc.strings_len[i]; y++){
+            encrypted += enc.getRes()[i][y];
+        }
+    }
+    return encrypted;
+}
+
+Cryption Node::encryptC(string message) {
+    return Crypter::encrypt(message,StringModifier::BN2LLI(decryptKey.secretKey));
+}
+
+Cryption Node::encryptC(Cryption &c) {
+    return Crypter::encrypt(c,StringModifier::BN2LLI(decryptKey.secretKey));
+}
+
+string Node::decrypt(Cryption &message) {
+    long long int key = StringModifier::BN2LLI(encryptKey.secretKey);
+    Cryption dec = Crypter::decrypt(message, key);
+    string decrypted;
+    for(int i = 0; i < dec.getRes().size(); i++){
+        for(int y = 0; y < dec.strings_len[i]; y++){
+            decrypted += dec.getRes()[i][y];
+        }
+    }
+    return decrypted;
+}
+
+Cryption Node::decryptC(Cryption message) {
+    return Crypter::decrypt(message, StringModifier::BN2LLI(encryptKey.secretKey));
 }

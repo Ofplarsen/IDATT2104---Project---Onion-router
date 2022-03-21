@@ -60,7 +60,6 @@ long long int StringModifier::BN2LLI(BIGNUM *num){
     char* charNum;
 
     charNum = BN_bn2dec(dupNum);
-
     string strNum = string(charNum);
     return stoll(strNum, nullptr, 10);
 }

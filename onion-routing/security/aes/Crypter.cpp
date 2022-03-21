@@ -6,6 +6,8 @@
 #include <openssl/bio.h>
 #include <cstring>
 #include <utility>
+#include <openssl/err.h>
+#include <iostream>
 #include "../string-modifier/StringModifier.h"
 #include "Crypter.h"
 #include "../model/Cryption.h"
@@ -26,9 +28,10 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
         perror("EVP_EncryptInit_ex");
         exit(-1);
     }
-
+    //EVP_CIPHER_CTX_set_padding(ctx, 0);
     if(!EVP_DecryptUpdate(ctx, text, &len, cipher, cipher_len)){
         perror("EVP_EncryptUpdate(");
+
         exit(-1);
     }
 
@@ -70,12 +73,18 @@ int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsi
     cipher_len += len;
 
     if(!EVP_EncryptFinal_ex(ctx, cipher + len, &len)){
-        perror("EVP_EncryptFinal_ex");
+        BIO *bio = BIO_new(BIO_s_mem());
+        ERR_print_errors(bio);
+        char *buf;
+        size_t len = BIO_get_mem_data(bio, &buf);
+        string ret(buf, len);
+        BIO_free(bio);
+        std::cout <<  ret << endl;
         exit(-1);
     }
 
     cipher_len += len;
-    EVP_CIPHER_CTX_free(ctx);
+    EVP_CIPHER_CTX_cleanup(ctx);
 
     return cipher_len;
 }
@@ -94,6 +103,7 @@ Cryption Crypter::encryptString(vector<string> strings, long long int key) {
         unsigned char encrypted[64];
         memset(encrypted, 0, 64);
         std::string keyd = std::to_string(key);
+        int t = strlen((const char*)(temp));
         int encrypted_len = encrypt(temp, strlen((const char*)(temp)), StringModifier::convertToCharArray(std::to_string(key)), encrypted);
 
         char * copy = static_cast<char *>(malloc(encrypted_len));
@@ -103,13 +113,33 @@ Cryption Crypter::encryptString(vector<string> strings, long long int key) {
         c.res.push_back(reinterpret_cast<unsigned char *const>(copy));
     }
 
-//    for(int i = 0; i < returnValue.size(); i++){
-//        for(int y = 0; y < returnLengths[i]; y++){
-//            printf("%02x ", returnValue[i][y]);
-//        }
-//    }
-
     return c;
+}
+
+Cryption Crypter::encryptString(Cryption &c, long long int key) {
+
+    //std::vector<std::string> strings = StringModifier::splitString(text, 32);
+    vector<unsigned char*> returnValue;
+    std::vector<int> returnLengths;
+    Cryption cr;
+    for(int i = 0; i < c.strings_len.size(); i++){
+        unsigned char* temp;
+        temp = (unsigned char*)( c.res[i]);
+        vector <unsigned char> test;
+
+        unsigned char encrypted[64];
+        memset(encrypted, 0, 64);
+        std::string keyd = std::to_string(key);
+        int encrypted_len = encrypt(temp, c.strings_len[i], StringModifier::convertToCharArray(std::to_string(key)), encrypted);
+
+        char * copy = static_cast<char *>(malloc(encrypted_len));
+        strcpy(copy, reinterpret_cast<const char *>(encrypted));
+
+        cr.strings_len.push_back(encrypted_len);
+        cr.res.push_back(reinterpret_cast<unsigned char *const>(copy));
+    }
+
+    return cr;
 }
 
 Cryption Crypter::encryptString(vector<string> strings, unsigned char* key) {
@@ -225,6 +255,11 @@ Cryption Crypter::encrypt(string stringToEncrypt, long long int key) {
     vector<string> stringToEncryptSplit = StringModifier::splitString(std::move(stringToEncrypt), BLOCK_SIZE);
     Cryption enc = Crypter::encryptString(stringToEncryptSplit, key);
 
+    return enc;
+}
+
+Cryption Crypter::encrypt(Cryption &c, long long int key) {
+    Cryption enc = Crypter::encryptString(c, key);
     return enc;
 }
 

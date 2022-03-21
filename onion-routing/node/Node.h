@@ -9,6 +9,7 @@
 #include <string>
 #include <winsock.h>
 #include "../security/key/Key.h"
+#include "../security/model/Cryption.h"
 
 using namespace std;
 
@@ -21,7 +22,7 @@ public:
     Node *prevNode;
     Node *nextNode;
     string encrypt(string message);
-    string decrypt(string message);
+    //string decrypt(Cryption message);
     string get_public_key();
     void send_message(string message);
     void receive_message(string message);
@@ -31,6 +32,15 @@ public:
     SOCKET getConnectSocket(const char *ip, const char *port);
     SOCKET getListenSocket(const char *port_nr);
 
+    Cryption encrypt(Cryption message);
+
+    Cryption encryptC(string message);
+
+    Cryption decryptC(Cryption message);
+
+    string decrypt(Cryption &message);
+
+    Cryption encryptC(Cryption &c);
 };
 
 
