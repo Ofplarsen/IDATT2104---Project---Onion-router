@@ -12,10 +12,9 @@
  */
 class Handshake {
 private:
-    static void doHandshake(Key &k1, Key &k2);
 public:
     static bool doHandshake(Node n1, Node n2);
-
+    static unsigned long long int doHandshake(Key &k1, Key &k2);
 };
 
 

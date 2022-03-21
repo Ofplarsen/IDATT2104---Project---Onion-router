@@ -14,11 +14,10 @@ using namespace std;
 
 class Node {
 private:
-
-    Key private_key;
-    Key public_key;
     string message;
 public:
+    Key encryptKey;
+    Key decryptKey;
     Node *prevNode;
     Node *nextNode;
     string encrypt(string message);
@@ -31,6 +30,7 @@ public:
     void initialize_server_socket(const char *port_nr, const char *next_node_port);
     SOCKET getConnectSocket(const char *ip, const char *port);
     SOCKET getListenSocket(const char *port_nr);
+
 };
 
 

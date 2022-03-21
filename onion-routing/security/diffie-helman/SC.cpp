@@ -3,6 +3,7 @@
 #include <ctime>
 #include <bits/stdc++.h>
 #include "SC.h"
+#include "../big-int/BigInt.h"
 
 
 using namespace std;
@@ -17,7 +18,18 @@ unsigned long long int SC::power(long long int a, long long int b,
         long long int p){
     if(b == 1)
         return a;
-    return (((long long int) pow(a,b)) % p);
+    return (((unsigned long long int) pow(a,b)) % p);
+};
+
+BigInt SC::power(BigInt &a, BigInt &b,
+                 BigInt &p){
+    if(b == 1)
+        return a;
+    BigInt n;
+    n = a^b;
+    BigInt c;
+    c = n%p;
+    return c;
 };
 
 /**
@@ -45,9 +57,12 @@ bool SC::isPrime(long long int number){
  * @return
  */
 unsigned long long int SC::getRandomPrime(){
-    long long int rndNumb = rand() % 100000000 + 100000000;
+    long long int rndNumb;
+    for(int i = 0; i < 5; i++){
+        rndNumb = (rand() % 100000000);
+    }
     while(!isPrime(rndNumb))
-        rndNumb++;
+        rndNumb += 1;
     return rndNumb;
 };
 
@@ -60,18 +75,18 @@ unsigned long long int SC::generatePrivateKey(){
 };
 
 //TODO REMOVE THESE IF no use
-//unsigned long long int SC::powerG(int x, unsigned int y, int p){
-//    int res = 1;
-//
-//    x = x % p;
-//    while(y > 0){
-//        if(y & 1)
-//            res = (res * x) % p;
-//        y = y >> 1;
-//        x = (x*x) % p;
-//    }
-//    return res;
-//}
+unsigned long long int SC::powerG(int x, unsigned int y, int p){
+    int res = 1;
+
+    x = x % p;
+    while(y > 0){
+        if(y & 1)
+            res = (res * x) % p;
+        y = y >> 1;
+        x = (x*x) % p;
+    }
+    return res;
+}
 
 //
 //unordered_set<int> SC::GeneratePrimes(int n){

@@ -3,14 +3,17 @@
 //
 #include "Key.h"
 #include "../diffie-helman/SC.h"
-#define P 1786534726771898
-#define G 1234567890123
+#include "../big-int/"
+#include "../big-int/BigInt.h"
+
+#define P 1786534
+#define G 123
 
 /**
  * Generates a key by using publicG, private and P key
  * @return
  */
-unsigned long long int Key::generateKey(){
+BigInt Key::generateKey(){
     generatedKey = SC::power(publicKeyG, privateKey ,publicKeyP);
     return generatedKey;
 };
@@ -55,5 +58,9 @@ Key::Key() {
     privateKey = SC::generatePrivateKey();
     publicKeyP = P;
     publicKeyG = G;
+}
+
+unsigned long long int Key::fixKeys(unsigned long long int key) {
+
 }
 

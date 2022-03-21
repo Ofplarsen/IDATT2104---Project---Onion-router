@@ -5,22 +5,24 @@
 #ifndef IDATT2104___PROJECT___ONION_ROUTER_KEY_H
 #define IDATT2104___PROJECT___ONION_ROUTER_KEY_H
 
+#include "../big-int/BigInt.h"
+
 /**
  * Class that hold public, private, gen, and secret keys for node
  */
 class Key {
 private:
-    unsigned long long int privateKey;
-    unsigned long long int publicKeyP;
-    unsigned long long int publicKeyG;
-    unsigned long long int generatedKey;
-    unsigned long long int secretKey;
+    BigInt privateKey;
+    BigInt publicKeyP;
+    BigInt publicKeyG;
+    BigInt generatedKey;
+    BigInt secretKey;
 
-
+    static unsigned long long int fixKeys(unsigned long long int key);
 public:
     Key();
 
-    unsigned long long int generateKey();
+    BigInt generateKey();
     unsigned long long int getSecretKey(long long int generatedKey);
 
     unsigned long long int getPrivateKey() const;

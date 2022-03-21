@@ -7,16 +7,18 @@
 
 #include "vector"
 #include "../node/Node.h"
+#include "map"
 using namespace std;
 class MainServer {
 private:
-    vector <Key> keys;
+    map<Node, Key> keys{};
     Node node; //Byttes ut med socket
+    vector<Node> userNodes;
+
+    bool generateKeys();
+
 public:
-
-    void generateKeys(){
-
-    }
+    MainServer();
 };
 
 
