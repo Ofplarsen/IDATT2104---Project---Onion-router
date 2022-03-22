@@ -4,7 +4,7 @@
 #include "Key.h"
 #include "../diffie-helman/SC.h"
 
-#define G 12345678901237
+#define G 13454757
 #define P 6728042131072171
 /**
  * Generates a key by using publicG, private and P key

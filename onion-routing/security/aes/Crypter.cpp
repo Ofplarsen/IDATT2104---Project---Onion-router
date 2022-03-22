@@ -24,7 +24,7 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
         exit(-1);
     }
 
-    if(!EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key, NULL)){
+    if(!EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, NULL)){
         perror("EVP_EncryptInit_ex");
         exit(-1);
     }
@@ -60,7 +60,7 @@ int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsi
         exit(-1);
     }
 
-    if(!EVP_EncryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key, NULL)){
+    if(!EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, NULL)){
         perror("EVP_EncryptInit_ex");
         exit(-1);
     }
@@ -73,14 +73,8 @@ int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsi
     cipher_len += len;
 
     if(!EVP_EncryptFinal_ex(ctx, cipher + len, &len)){
-        BIO *bio = BIO_new(BIO_s_mem());
-        ERR_print_errors(bio);
-        char *buf;
-        size_t len = BIO_get_mem_data(bio, &buf);
-        string ret(buf, len);
-        BIO_free(bio);
-        std::cout <<  ret << endl;
-        exit(-1);
+        perror("EVP_encrypt");
+        return -1;
     }
 
     cipher_len += len;
