@@ -74,7 +74,7 @@ SOCKET SocketGetters::getListenSocket(const char *port_nr){
         return NULL;
     }
 
-    struct addrinfo *result = NULL, *ptr = NULL, hints;
+    struct addrinfo *result = NULL, hints;
 
     ZeroMemory(&hints, sizeof(hints));
     hints.ai_family = AF_INET;

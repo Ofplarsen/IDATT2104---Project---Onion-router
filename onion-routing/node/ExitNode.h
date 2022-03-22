@@ -5,10 +5,10 @@
 #ifndef IDATT2104___PROJECT___ONION_ROUTER_EXITNODE_H
 #define IDATT2104___PROJECT___ONION_ROUTER_EXITNODE_H
 
+#include <winsock2.h>
 #include <iostream>
 #include <unistd.h>
 #include <stdio.h>
-#include <winsock2.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ws2tcpip.h>

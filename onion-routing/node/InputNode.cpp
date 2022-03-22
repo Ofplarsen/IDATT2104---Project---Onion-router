@@ -24,15 +24,16 @@ void InputNode::initialize_server_socket(const char *port_nr) {
     }
 
     #define DEFAULT_BUFLEN 512
-    char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
     int iResult;
     int iSendResult;
     int iStart;
-    string initial_user_req;
 
     // Receive until the peer shuts down the connection
+    char recvbuf[DEFAULT_BUFLEN];
     do {
+
+        string initial_user_req;
         do {
             iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
             printf("Bytes received: %d\n", iStart);
@@ -44,17 +45,14 @@ void InputNode::initialize_server_socket(const char *port_nr) {
         vector<string> parsed = parse_initial_request(initial_user_req); //Contains domain_name and path
 
         //constructing a get request that the node will send to socket on internet
-        const char *get_req_ptr = construct_get_request(parsed.at(0), parsed.at(1)).c_str();
-        std::cout << get_req_ptr << std::endl;
-
+        string getReq = construct_get_request(parsed.at(0), parsed.at(1));
 
         if (iResult > 0) {
-            printf("Bytes received: %d\n", iResult);
-
             SOCKET web_page_socket = getConnectSocket("192.168.1.14", "8087"); //TODO fix here to change which connection to forward to
             cout << "connected to next, trying to send" << endl;
-            iSendResult = send(web_page_socket, get_req_ptr, (int) strlen(get_req_ptr), 0); //forwarding received message to next/server
+            iSendResult = send(web_page_socket, getReq.c_str(), getReq.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
+                printf("HAPPENED IN INPUTNODE PLACE 1");
                 printf("send failed: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
                 WSACleanup();
@@ -76,6 +74,7 @@ void InputNode::initialize_server_socket(const char *port_nr) {
                 iSendResult = send(ClientSocket, recvbuf, recvbuflen, 0); //Sending back to prevNode immediately
                 if (iSendResult == SOCKET_ERROR) {
                     printf("send failed: %d\n", WSAGetLastError());
+                    printf("HAPPENED IN INPUTNODE PLACE 2");
                     closesocket(ClientSocket);
                     WSACleanup();
                     return;
@@ -91,6 +90,7 @@ void InputNode::initialize_server_socket(const char *port_nr) {
             } while (iResult > 0);
 
             printf("final %d\n", iSendResult);
+            closesocket(web_page_socket);
 
 
         }
@@ -117,6 +117,7 @@ void InputNode::initialize_server_socket(const char *port_nr) {
 
     // cleanup
     closesocket(ClientSocket);
+    closesocket(ListenSocket);
     WSACleanup();
 }
 

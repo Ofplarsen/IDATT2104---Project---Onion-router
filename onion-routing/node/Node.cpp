@@ -2,9 +2,9 @@
 // Created by xray2 on 14/03/2022.
 //
 
+#include <winsock2.h>
 #include "Node.h"
 #include <iostream>
-#include <winsock2.h>
 #include <ws2tcpip.h>
 #include <regex>
 
@@ -28,15 +28,16 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
 
     #define DEFAULT_BUFLEN 512
 
-    char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
     int iResult;
     int iSendResult;
     int iStart;
-    string initial_user_req;
 
     // Receive until the peer shuts down the connection
+    char recvbuf[DEFAULT_BUFLEN];
     do {
+
+        string initial_user_req;
         do {
         iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
         printf("Bytes received: %d\n", iStart);
@@ -53,6 +54,7 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
             SOCKET web_page_socket = getConnectSocket("192.168.1.14", next_node_port); //TODO needs fix, ip MUST be more dynamic
             iSendResult = send(web_page_socket, initial_user_req.c_str(), initial_user_req.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
+                printf("HAPPENED IN NODE PLACE 1");
                 printf("send failed: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
                 WSACleanup();
@@ -73,6 +75,7 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
                 iResult = recv(web_page_socket, recvbuf, recvbuflen, 0); //Receiving from nextNode
                 iSendResult = send(ClientSocket, recvbuf, recvbuflen, 0); //Sending back to prevNode immediately
                 if (iSendResult == SOCKET_ERROR) {
+                    printf("HAPPENED IN NODE PLACE 2");
                     printf("send failed: %d\n", WSAGetLastError());
                     closesocket(ClientSocket);
                     WSACleanup();
@@ -89,7 +92,7 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
             } while (iResult > 0);
 
             printf("final %d\n", iSendResult);
-
+            closesocket(web_page_socket);
 
         }
         else if (iResult == 0) {
@@ -115,6 +118,7 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
 
     // cleanup
     closesocket(ClientSocket);
+    closesocket(ListenSocket);
     WSACleanup();
 }
 

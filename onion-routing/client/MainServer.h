@@ -31,6 +31,8 @@ public:
     int getNodeAmount(int min, int max);
     string welcome();
     string help();
+
+    string notFound();
 };
 
 

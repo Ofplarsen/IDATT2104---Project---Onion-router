@@ -157,14 +157,15 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
 
 #define DEFAULT_BUFLEN 512
 
-    char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
     int iSendResult;
     int iStart;
-    string initial_user_req;
 
     // Receive until the peer shuts down the connection
+    char recvbuf[DEFAULT_BUFLEN];
     do {
+
+        string initial_user_req;
         do {
             iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
             printf("Bytes received: %d\n", iStart);
@@ -185,11 +186,13 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
         if(path_length == 0) path_length = -1;
 
         cout << "Domain length: " <<domain_length << " Path length: " << path_length << endl;
-
         string domain_name = initial_user_req.substr(29 + path_length, domain_length); //TODO needs polishing, not very dynamic
-
+        cout<<"Take one "<<domain_name<<endl;
+        int hostPos = initial_user_req.find("Host: ");
+        cout<<"Take two "<<initial_user_req.substr(hostPos + 6, domain_length)<<endl;
+        domain_name = initial_user_req.substr(hostPos + 6, domain_length);
         initial_user_req = initial_user_req.substr(first_ln_len+2, initial_user_req.length()); //Removing first line of request, redundant
-
+        cout<<initial_user_req<<endl;
         //getting IP address from domain sent in by user
         hostent *webDomain = gethostbyname(domain_name.c_str());
         in_addr *addr; //To get  char  version of ip: inet_ntoa(*addr)
@@ -201,13 +204,14 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
 
             addr = reinterpret_cast<in_addr*>(temp);
         }
-
+        cout<<inet_ntoa(*addr)<<endl;
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
             SOCKET web_page_socket = getConnectSocket(inet_ntoa(*addr), "80"); //HTTP listens on port 80
             iSendResult = send(web_page_socket, initial_user_req.c_str(), initial_user_req.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
+                printf("HAPPENED IN EXITNODE PLACE 1");
                 printf("send failed: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
                 WSACleanup();
@@ -228,6 +232,7 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
                 iResult = recv(web_page_socket, recvbuf, recvbuflen, 0); //Receiving from nextNode
                 iSendResult = send(ClientSocket, recvbuf, recvbuflen, 0); //Sending back to prevNode immediately
                 if (iSendResult == SOCKET_ERROR) {
+                    printf("HAPPENED IN EXITNODE PLACE 2");
                     printf("send failed: %d\n", WSAGetLastError());
                     closesocket(ClientSocket);
                     WSACleanup();
@@ -244,6 +249,7 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
             } while (iResult > 0);
 
             printf("final %d\n", iSendResult);
+            closesocket(web_page_socket);
 
 
         }
@@ -270,6 +276,7 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
 
     // cleanup
     closesocket(ClientSocket);
+    closesocket(ListenSocket);
     WSACleanup();
 }
 
