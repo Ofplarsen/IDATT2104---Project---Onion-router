@@ -12,6 +12,8 @@ void generateKeys(){
 
 }
 
+//Websites for testing: www.example.com, www.softwareqatest.com, www.columbia.edu/~fdc/sample.html (something goes wrong here), www.virtu-software.com (something goes wrong here)
+
 int MainServer::start() {
     //create nodePool with x Nodes and give them their
     //ask for nodeAmount, at least 3
@@ -144,7 +146,6 @@ int MainServer::start() {
         }
         else if(iResult == 0){ //Client has closed the connection, need to do the same and reestablish to continue loop
             cout << "Connection closing..." << endl;
-            //userRequest.clear(); //Clearing user request so as not to get invalid string
             string().swap(userRequest); //Removing space allocated for uerRequest
             iResult = shutdown(clientConnection, SD_SEND); //No more sending info to clientConnection
             if(iResult == SOCKET_ERROR){
@@ -231,6 +232,8 @@ string MainServer::help(){
             "<li>The current version only supports HTTP</li>"
             "<li>If you cannot normally navigate to an HTTP site via the IP address you get for it running the command nslookup, it is not supported (e.g. 1.1.1.1/80)</li>"
             "<li>Only works with Windows</li>"
+            "<li>Disable cache for the most reliable, but slow, experience</li>"
+            "<li>Not compatible with images</li>"
             //"<li></li>"
             "</ul>";
     string help = "HTTP/1.1 200 OK\r\n"
