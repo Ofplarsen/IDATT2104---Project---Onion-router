@@ -28,6 +28,8 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
 
     if(!ctx){
         perror(" EVP_CIPHER_CTX_new()");
+        EVP_CIPHER_CTX_free(ctx);
+
         exit(-1);
     }
 
@@ -38,6 +40,7 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
 
     if(!EVP_DecryptUpdate(ctx, text, &len, cipher, cipher_len)){
         perror("EVP_EncryptUpdate(");
+        EVP_CIPHER_CTX_free(ctx);
 
         exit(-1);
     }
@@ -51,7 +54,7 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
         size_t len = BIO_get_mem_data(bio, &buf);
         string ret(buf, len);
         BIO_free(bio);
-
+        EVP_CIPHER_CTX_free(ctx);
         cout << ret << endl;
         exit(-1);
     }
@@ -71,16 +74,19 @@ int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsi
 
     if(!ctx){
         perror(" EVP_CIPHER_CTX_new()");
+        EVP_CIPHER_CTX_cleanup(ctx);
         exit(-1);
     }
 
     if(!EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, NULL)){
         perror("EVP_EncryptInit_ex");
+        EVP_CIPHER_CTX_cleanup(ctx);
         exit(-1);
     }
 
     if(!EVP_EncryptUpdate(ctx, cipher, &len, text, text_len)){
         perror("EVP_EncryptUpdate(");
+        EVP_CIPHER_CTX_cleanup(ctx);
         exit(-1);
     }
 
@@ -88,6 +94,7 @@ int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsi
 
     if(!EVP_EncryptFinal_ex(ctx, cipher + len, &len)){
         perror("EVP_encrypt");
+        EVP_CIPHER_CTX_cleanup(ctx);
         return -1;
     }
 
@@ -110,9 +117,10 @@ Cryption Crypter::encryptString(vector<string> strings, long long int key) {
 
         unsigned char encrypted[64];
         memset(encrypted, 0, 64);
-        std::string keyd = std::to_string(key);
-        int t = strlen((const char*)(temp));
-        int encrypted_len = encrypt(temp, strlen((const char*)(temp)), StringModifier::convertToCharArray(std::to_string(key)), encrypted);
+        //std::string keyd = std::to_string(key);
+        unsigned long t = strlen((const char*)(temp));
+
+        int encrypted_len = encrypt(temp, t, StringModifier::convertToCharArray(std::to_string(key)), encrypted);
 
         char * copy = static_cast<char *>(malloc(encrypted_len));
         strcpy(copy, reinterpret_cast<const char *>(encrypted));
@@ -224,6 +232,7 @@ Cryption Crypter::decryptString(Cryption& cryption, long long int key) {
 
         returnLengths.emplace_back(dec_len);
         returnValue.emplace_back(reinterpret_cast<unsigned char *const>(copy));
+
     }
 
     Cryption c;

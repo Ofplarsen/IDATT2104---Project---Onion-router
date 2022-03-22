@@ -8,10 +8,9 @@
 #include <iostream>
 #include <unistd.h>
 #include <stdio.h>
-#include <winsock2.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ws2tcpip.h>
+
 
 #define PORT 8080
 
@@ -24,14 +23,7 @@ private:
     int iResult;
 
 public:
-    void sendGetRequest(const char *ip, const char *port);
 
-    void initialize_server_socket(const char *port_nr);
-
-    SOCKET getListenSocket(const char *nr);
-
-
-    SOCKET getConnectSocket(const char *ip, const char *port);
 };
 
 

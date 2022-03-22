@@ -5,10 +5,8 @@
 #include "onion-routing/security/model/Cryption.h"
 #include "onion-routing/security/string-modifier/StringModifier.h"
 #include "onion-routing/client/MainServer.h"
-#include "onion-routing/node/InputNode.h"
 #include "onion-routing/node/ExitNode.h"
-#include <winsock2.h>
-#include <ws2tcpip.h>
+
 #include <vector>
 #include <ctime>
 #include <thread>
