@@ -21,45 +21,15 @@ int main(int argc, char const *argv[]){
 
     vector<Node> nodes = main.getUserNodes();
 
-    std::string text = "Great lets test this bread wtf is asd asd a sd sdddd ";
+    std::string text = "GET / HTTP/1.1\r\n"
+                       "Host: localhost:1250\r\n"
+                       "Connection: keep-alive\r\n"
+                       "Cache-Control: max-age=0\r\n";
     string encrypted;
     string decrypted;
     vector<Cryption> c;
     encrypted = nodes[0].encrypt(text);
     c.push_back(nodes[0].encryptC(text));
-
-    decrypted = nodes[1].decrypt(c[0]);
-    cout << std::hex <<decrypted << endl;
-
-    cout << "\n\n"<< endl;
-
-    encrypted = nodes[1].encrypt(encrypted);
-    c.push_back(nodes[1].encryptC(c[0]));
-
-    decrypted = nodes[2].decrypt(c[1]);
-    cout << std::hex << decrypted << endl;
-    decrypted = nodes[1].decrypt(c[0]);
-    cout << std::hex <<decrypted << endl;
-
-    cout << "\n\n"<< endl;
-
-
-
-    encrypted = nodes[2].encrypt(encrypted);
-    c.push_back(nodes[2].encryptC(c[1]));
-    cout <<std::hex << encrypted << endl;
-    decrypted = nodes[3].decrypt(c[2]);
-    cout << std::hex << decrypted << endl;
-    decrypted = nodes[2].decrypt(c[1]);
-    cout << std::hex << decrypted << endl;
-    decrypted = nodes[1].decrypt(c[0]);
-    cout << std::hex <<decrypted << endl;
-
-    c.pop_back();
-    c.pop_back();
-    c.pop_back();
-    encrypted = nodes[0].encrypt(text);
-    c.push_back(nodes[0].encryptC(text));
     encrypted = nodes[1].encrypt(encrypted);
     c.push_back(nodes[1].encryptC(c[0]));
     encrypted = nodes[2].encrypt(encrypted);
@@ -71,13 +41,41 @@ int main(int argc, char const *argv[]){
     cout << std::hex << decrypted << endl;
     decrypted = nodes[1].decrypt(c[0]);
     cout << std::hex <<decrypted << endl;
+//    encrypted = nodes[0].encrypt(text);
+//    c.push_back(nodes[0].encryptC(text));
+//
+//    decrypted = nodes[1].decrypt(c[0]);
+//    cout << std::hex <<decrypted << endl;
+//
+//    cout << "\n\n"<< endl;
+//
+//    encrypted = nodes[1].encrypt(encrypted);
+//    c.push_back(nodes[1].encryptC(c[0]));
+//
+//    decrypted = nodes[2].decrypt(c[1]);
+//    cout << std::hex << decrypted << endl;
+//    decrypted = nodes[1].decrypt(c[0]);
+//    cout << std::hex <<decrypted << endl;
+//
+//    cout << "\n\n"<< endl;
 
 
-    c.pop_back();
-    c.pop_back();
-    c.pop_back();
-    encrypted = nodes[0].encrypt(text);
-    c.push_back(nodes[0].encryptC(text));
+
+//    encrypted = nodes[2].encrypt(encrypted);
+//    c.push_back(nodes[2].encryptC(c[1]));
+//    cout <<std::hex << encrypted << endl;
+//    decrypted = nodes[3].decrypt(c[2]);
+//    cout << std::hex << decrypted << endl;
+//    decrypted = nodes[2].decrypt(c[1]);
+//    cout << std::hex << decrypted << endl;
+//    decrypted = nodes[1].decrypt(c[0]);
+//    cout << std::hex <<decrypted << endl;
+
+//    c.pop_back();
+//    c.pop_back();
+//    c.pop_back();
+//    encrypted = nodes[0].encrypt(text);
+//    c.push_back(nodes[0].encryptC(text));
 //    encrypted = nodes[1].encrypt(encrypted);
 //    c.push_back(nodes[1].encryptC(c[0]));
 //    encrypted = nodes[2].encrypt(encrypted);
@@ -87,8 +85,9 @@ int main(int argc, char const *argv[]){
 //    cout << std::hex << decrypted << endl;
 //    decrypted = nodes[2].decrypt(c[1]);
 //    cout << std::hex << decrypted << endl;
-    decrypted = nodes[1].decrypt(c[0]);
-    cout << std::hex <<decrypted << endl;
+//    decrypted = nodes[1].decrypt(c[0]);
+//    cout << std::hex <<decrypted << endl;
+
 //    char recvbuf[512];
 //    int recvbuflen = 512;
 //    string test = "";
@@ -112,24 +111,6 @@ int main(int argc, char const *argv[]){
 //        WSACleanup();
 //        return 0;
 //    }
-//    test += string(recvbuf).substr(0, res2); //Gathering user request in a string
-//    cout << test << endl << endl;
-//    closesocket(receive);
-//    closesocket(sender);
-//    WSACleanup();
-//    Node n1;
-//    InputNode inp1;
-//    ExitNode exn1;
-//    n1.nextNode = &exn1;
-    //inp1.initialize_server_socket(8081);
-//std::thread t1(&InputNode::initialize_server_socket, &inp1, "8081");
-//    std::thread t2(&Node::initialize_server_socket, &inp1, "8087", "8080");
-//    std::thread t3(&ExitNode::initialize_server_socket, &exn1, "8080");
-//    //n1.initialize_server_socket("8080");
-//
-//    t1.join();
-//    t2.join();
-//    t3.join();
     return 0;
 
     //Cryption enc = Crypter::encrypt(text, BN_get_word(nodes[0].decryptKey.getSecretKey1()));

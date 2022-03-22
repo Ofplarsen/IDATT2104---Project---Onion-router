@@ -31,7 +31,7 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
         exit(-1);
     }
 
-    if(!EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, NULL)){
+    if(!EVP_DecryptInit_ex(ctx, EVP_aes_128_ctr(), NULL, key, NULL)){
         perror("EVP_EncryptInit_ex");
         exit(-1);
     }
@@ -43,7 +43,7 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
     }
 
     text_len += len;
-    //EVP_CIPHER_CTX_set_padding(ctx, 0);
+    EVP_CIPHER_CTX_set_padding(ctx, 0);
     if(!EVP_DecryptFinal_ex(ctx, text + len, &len)){
         BIO *bio = BIO_new(BIO_s_mem());
         ERR_print_errors(bio);
@@ -74,7 +74,7 @@ int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsi
         exit(-1);
     }
 
-    if(!EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, NULL)){
+    if(!EVP_EncryptInit_ex(ctx, EVP_aes_128_ctr(), NULL, key, NULL)){
         perror("EVP_EncryptInit_ex");
         exit(-1);
     }
@@ -104,21 +104,20 @@ Cryption Crypter::encryptString(vector<string> strings, long long int key) {
     std::vector<int> returnLengths;
     Cryption c;
     for(int i = 0; i < strings.size(); i++){
-        unsigned char* temp;
-        temp = (unsigned char*)( strings[i].c_str());
+        unsigned char* temp = (unsigned char*)( strings[i].c_str());
         vector <unsigned char> test;
 
-        unsigned char encrypted[64];
-        memset(encrypted, 0, 64);
+        unsigned char encrypted[128];
+        memset(encrypted, 0, 128);
         std::string keyd = std::to_string(key);
         int t = strlen((const char*)(temp));
         int encrypted_len = encrypt(temp, strlen((const char*)(temp)), StringModifier::convertToCharArray(std::to_string(key)), encrypted);
 
         char * copy = static_cast<char *>(malloc(encrypted_len));
-        strcpy(copy, reinterpret_cast<const char *>(encrypted));
+        strcpy(copy, reinterpret_cast<char *>(encrypted));
 
         c.strings_len.push_back(encrypted_len);
-        c.res.push_back(reinterpret_cast<unsigned char *const>(copy));
+        c.res.push_back(reinterpret_cast<unsigned char *>(copy));
     }
 
     return c;
