@@ -56,11 +56,11 @@ int MainServer::start() {
                 break;
             }
             //when user logged on, send welcome message
-            if(userCommand.empty()){
+            else if(userCommand.empty()){
                 string welcomeMsg = welcome();
                 send(clientConnection, welcomeMsg.c_str(), welcomeMsg.length(), 0);
             }
-            if(userCommand == "favicon.ico"){
+            else if(userCommand == "favicon.ico"){
                 string notFoundMsg = notFound();
                 send(clientConnection, notFoundMsg.c_str(), notFoundMsg.length(), 0);
             }
@@ -137,17 +137,10 @@ int MainServer::start() {
                     return -4;
                 }
             }
-
-
-            /*  // Echo the buffer back to the sender
-              iSendResult = send(clientConnection, recvbuf, iResult, 0);
-              if (iSendResult == SOCKET_ERROR) {
-                  printf("send failed: %d\n", WSAGetLastError());
-                  closesocket(clientConnection);
-                  WSACleanup();
-                  return 1;
-              }
-              printf("Bytes sent: %d\n", iSendResult);*/
+            else{
+                string notFoundMsg = notFound();
+                send(clientConnection, notFoundMsg.c_str(), notFoundMsg.length(), 0);
+            }
         }
         else if(iResult == 0){ //Client has closed the connection, need to do the same and reestablish to continue loop
             cout << "Connection closing..." << endl;
