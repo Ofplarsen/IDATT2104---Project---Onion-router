@@ -107,12 +107,12 @@ int MainServer::start() {
                 //Extracting content length from header
                 size_t contLenPos = response.find("Content-Length: "); //Find position of string
                 size_t newLnAfterContLen = response.find("\r\n", contLenPos); //Find first newline after contLenPos
-                int contLen = stoi(response.substr(contLenPos+16, newLnAfterContLen));
+                int contLen = stoi(response.substr(contLenPos+16, newLnAfterContLen)); //Content length
 
                 //Finding how long the headers are
                 size_t headerEndPos = response.find("\r\n\r\n");
                 //Getting only the part of the response we need
-                response = response.substr(0, contLen + headerEndPos + 4); //TODO not sure about the offset
+                response = response.substr(0, contLen + headerEndPos + 4); //TODO not sure why the offset works, but it does
                 //cout <<response<< endl;
                 cout <<response<< endl;
                 cout << "Header end "<<headerEndPos << endl;
@@ -120,23 +120,23 @@ int MainServer::start() {
                 //cout << recvbuf << endl;
                 printf("final %d\n", iSendResult);
 
+                //Threads are done
                 t1.join();
                 t2.join();
                 t3.join();
-                iSendResult = send(clientConnection, response.c_str(), response.length(), 0); //Sending back to prevNode immediately
 
+                //Sending back to client
+                iSendResult = send(clientConnection, response.c_str(), response.length(), 0);
                 if (iSendResult == SOCKET_ERROR) {
                     printf("HAPPENED IN MAINSERVER PLACE 2");
                     printf("send failed: %d\n", WSAGetLastError());
                     cout << recvbuf << endl;
                     closesocket(clientConnection);
                     WSACleanup();
-                    t1.join();
-                    t2.join();
-                    t3.join();
                     return -4;
                 }
             }
+            //If command is not found
             else{
                 string notFoundMsg = notFound();
                 send(clientConnection, notFoundMsg.c_str(), notFoundMsg.length(), 0);
