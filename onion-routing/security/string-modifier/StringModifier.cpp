@@ -37,6 +37,30 @@ std::vector<std::string> StringModifier::splitString(std::string string, int spl
     return vector;
 }
 
+Cryption StringModifier::splitString(std::string string) {
+    Cryption c;
+    std::vector<unsigned char*> vector;
+    std::vector<int> lengths;
+    int length = string.length();
+    int intervals = length/16;
+
+
+    for (auto i = 0; i < intervals; i++)
+    {
+        c.res.push_back(convertToCharArray(string.substr(i * 16, 16)));
+        c.strings_len.push_back(16);
+    }
+
+    if (string.length() % 16 != 0)
+    {
+        int l = string.substr(16 * intervals).length();
+        c.res.push_back(convertToCharArray(string.substr(16 * intervals)));
+        c.strings_len.push_back(l);
+    }
+
+    return c;
+}
+
 unsigned char *StringModifier::convertToCharArray(std::string text) {
     return (unsigned char*) text.c_str();
 }

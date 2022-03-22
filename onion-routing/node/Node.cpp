@@ -237,6 +237,7 @@ SOCKET Node::getListenSocket(const char *port_nr){
 }
 
 string Node::encrypt(string message) {
+    cout << StringModifier::BN2LLI(decryptKey.secretKey) << endl;
     Cryption enc = Crypter::encrypt(message,StringModifier::BN2LLI(decryptKey.secretKey));
     string encrypted;
     for(int i = 0; i < enc.getRes().size(); i++){
@@ -257,6 +258,7 @@ Cryption Node::encryptC(Cryption &c) {
 
 string Node::decrypt(Cryption &message) {
     long long int key = StringModifier::BN2LLI(encryptKey.secretKey);
+    cout << key << endl;
     Cryption dec = Crypter::decrypt(message, key);
     string decrypted;
     for(int i = 0; i < dec.getRes().size(); i++){
@@ -267,6 +269,6 @@ string Node::decrypt(Cryption &message) {
     return decrypted;
 }
 
-Cryption Node::decryptC(Cryption message) {
-    return Crypter::decrypt(message, StringModifier::BN2LLI(encryptKey.secretKey));
+Cryption Node::decryptC(vector<string> msg, vector<int> length) {
+    return Crypter::decrypt(message,length, StringModifier::BN2LLI(encryptKey.secretKey));
 }

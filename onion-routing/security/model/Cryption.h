@@ -25,6 +25,7 @@ public:
      */
     vector <unsigned char*> res;
 
+
     //Cryption(const vector <string> &strings);
 
     const vector<int> &getStringsLen() const;

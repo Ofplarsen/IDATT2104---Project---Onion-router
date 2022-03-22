@@ -22,6 +22,8 @@ public:
     static string BN2Str(BIGNUM *num);
 
     static long long int BN2LLI(BIGNUM *num);
+
+    static Cryption splitString(string string);
 };
 
 

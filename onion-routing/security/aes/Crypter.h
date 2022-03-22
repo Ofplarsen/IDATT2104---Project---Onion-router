@@ -29,6 +29,7 @@ public:
 
     static Cryption encryptString(vector<string> strings, unsigned char *key);
 
+
     static Cryption encrypt(string stringToEncrypt, unsigned char *key);
 
     static Cryption decrypt(Cryption &cryption, unsigned char *key);
@@ -36,6 +37,8 @@ public:
     static Cryption encryptString(Cryption &c, long long int key);
 
     static Cryption encrypt(Cryption &c, long long int key);
+
+    static string removePadding(string string1);
 };
 
 

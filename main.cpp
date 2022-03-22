@@ -12,33 +12,81 @@
 #include <vector>
 #include <ctime>
 #include <thread>
+#include <openssl/err.h>
+#include <openssl/evp.h>
 
-
-#define P 1786534726771898
-#define G 1234567890123
 int main(int argc, char const *argv[]){
 
     MainServer main;
 
     vector<Node> nodes = main.getUserNodes();
 
-    std::string text = "GET / HTTP/1.1\r\n"
-                       "Host: localhost that is longer";
-
+    std::string text = "Great lets test this bread wtf is asd asd a sd sdddd ";
     string encrypted;
     string decrypted;
     vector<Cryption> c;
     encrypted = nodes[0].encrypt(text);
     c.push_back(nodes[0].encryptC(text));
+
+    decrypted = nodes[1].decrypt(c[0]);
+    cout << std::hex <<decrypted << endl;
+
+    cout << "\n\n"<< endl;
+
     encrypted = nodes[1].encrypt(encrypted);
     c.push_back(nodes[1].encryptC(c[0]));
+
+    decrypted = nodes[2].decrypt(c[1]);
+    cout << std::hex << decrypted << endl;
+    decrypted = nodes[1].decrypt(c[0]);
+    cout << std::hex <<decrypted << endl;
+
+    cout << "\n\n"<< endl;
+
+
+
+    encrypted = nodes[2].encrypt(encrypted);
+    c.push_back(nodes[2].encryptC(c[1]));
+    cout <<std::hex << encrypted << endl;
+    decrypted = nodes[3].decrypt(c[2]);
+    cout << std::hex << decrypted << endl;
+    decrypted = nodes[2].decrypt(c[1]);
+    cout << std::hex << decrypted << endl;
+    decrypted = nodes[1].decrypt(c[0]);
+    cout << std::hex <<decrypted << endl;
+
+    c.pop_back();
+    c.pop_back();
+    c.pop_back();
+    encrypted = nodes[0].encrypt(text);
+    c.push_back(nodes[0].encryptC(text));
+    encrypted = nodes[1].encrypt(encrypted);
+    c.push_back(nodes[1].encryptC(c[0]));
+    encrypted = nodes[2].encrypt(encrypted);
+    c.push_back(nodes[2].encryptC(c[1]));
+    cout <<std::hex << encrypted << endl;
+    decrypted = nodes[3].decrypt(c[2]);
+    cout << std::hex << decrypted << endl;
+    decrypted = nodes[2].decrypt(c[1]);
+    cout << std::hex << decrypted << endl;
+    decrypted = nodes[1].decrypt(c[0]);
+    cout << std::hex <<decrypted << endl;
+
+
+    c.pop_back();
+    c.pop_back();
+    c.pop_back();
+    encrypted = nodes[0].encrypt(text);
+    c.push_back(nodes[0].encryptC(text));
+//    encrypted = nodes[1].encrypt(encrypted);
+//    c.push_back(nodes[1].encryptC(c[0]));
 //    encrypted = nodes[2].encrypt(encrypted);
 //    c.push_back(nodes[2].encryptC(c[1]));
 //    cout <<std::hex << encrypted << endl;
 //    decrypted = nodes[3].decrypt(c[2]);
 //    cout << std::hex << decrypted << endl;
-    decrypted = nodes[2].decrypt(c[1]);
-    cout << std::hex << decrypted << endl;
+//    decrypted = nodes[2].decrypt(c[1]);
+//    cout << std::hex << decrypted << endl;
     decrypted = nodes[1].decrypt(c[0]);
     cout << std::hex <<decrypted << endl;
 //    char recvbuf[512];
@@ -46,12 +94,12 @@ int main(int argc, char const *argv[]){
 //    string test = "";
 //    SOCKET receive = nodes[0].getListenSocket("8081");
 //    //SOCKET ClientSocket = accept(receive, NULL, NULL);
-////    if (ClientSocket == INVALID_SOCKET) {
-////        printf("accept failed: %d\n", WSAGetLastError());
-////        closesocket(receive);
-////        WSACleanup();
-////        return -1;
-////    }
+//    if (ClientSocket == INVALID_SOCKET) {
+//        printf("accept failed: %d\n", WSAGetLastError());
+//        closesocket(receive);
+//        WSACleanup();
+//        return -1;
+//    }
 //    SOCKET sender = nodes[0].getConnectSocket("192.168.10.100", "8081");
 //    int res = send(sender,encrypted.c_str(), encrypted.length(), 0);
 //    cout << encrypted.c_str() << endl;

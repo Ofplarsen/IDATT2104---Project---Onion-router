@@ -11,8 +11,15 @@
 #include "../string-modifier/StringModifier.h"
 #include "Crypter.h"
 #include "../model/Cryption.h"
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <string.h>
+#include <iostream>
+#define BLOCK_SIZE 16
 
-#define BLOCK_SIZE 32
+using namespace std;
+
+
 int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, unsigned char* text){
     int text_len = 0;
     int len = 0;
@@ -28,7 +35,7 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
         perror("EVP_EncryptInit_ex");
         exit(-1);
     }
-    //EVP_CIPHER_CTX_set_padding(ctx, 0);
+
     if(!EVP_DecryptUpdate(ctx, text, &len, cipher, cipher_len)){
         perror("EVP_EncryptUpdate(");
 
@@ -36,9 +43,16 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
     }
 
     text_len += len;
-
+    //EVP_CIPHER_CTX_set_padding(ctx, 0);
     if(!EVP_DecryptFinal_ex(ctx, text + len, &len)){
-        perror("EVP_DencryptFinal_ex");
+        BIO *bio = BIO_new(BIO_s_mem());
+        ERR_print_errors(bio);
+        char *buf;
+        size_t len = BIO_get_mem_data(bio, &buf);
+        string ret(buf, len);
+        BIO_free(bio);
+
+        cout << ret << endl;
         exit(-1);
     }
 
@@ -174,8 +188,8 @@ Cryption Crypter::decryptString(Cryption& cryption, unsigned char* key) {
 
     for(int i = 0; i < cryption.getRes().size(); i++){
         auto* temp = (unsigned char *) cryption.getRes()[i];
-        unsigned char decrypted[64];
-        memset(decrypted, 0, 64);
+        unsigned char decrypted[cryption.strings_len[i]];
+        memset(decrypted, 0, cryption.strings_len[i]);
         int dec_len = decrypt(temp, cryption.strings_len[i], key, decrypted);
 
 
@@ -278,3 +292,6 @@ Cryption Crypter::decrypt(Cryption &cryption, unsigned char* key) {
     return decryptString(cryption, key);
 }
 
+string Crypter::removePadding(string string1){
+
+}
