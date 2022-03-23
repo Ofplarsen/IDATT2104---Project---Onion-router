@@ -42,10 +42,10 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
         iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
         printf("Bytes received: %d\n", iStart);
         initial_user_req += string(recvbuf).substr(0, iStart); //Gathering user request in a string
-        cout << recvbuf << endl << endl;
+        //cout << recvbuf << endl;
         iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
-        cout << "Received from prev: " << initial_user_req << "\n" << endl;
+        //cout << "Received from prev: " << initial_user_req << "\n" << endl;
 
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);

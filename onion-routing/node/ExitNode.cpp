@@ -186,11 +186,11 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
         if(path_length == 0) path_length = -1;
 
         cout << "Domain length: " <<domain_length << " Path length: " << path_length << endl;
-        string domain_name = initial_user_req.substr(29 + path_length, domain_length); //TODO needs polishing, not very dynamic
-        cout<<"Take one "<<domain_name<<endl;
-        int hostPos = initial_user_req.find("Host: ");
-        cout<<"Take two "<<initial_user_req.substr(hostPos + 6, domain_length)<<endl;
-        domain_name = initial_user_req.substr(hostPos + 6, domain_length);
+        //string domain_name = initial_user_req.substr(29 + path_length, domain_length); //TODO needs polishing, not very dynamic
+        //cout<<"Take one "<<domain_name<<endl;
+        size_t hostPos = initial_user_req.find("Host: ");
+        string domain_name = initial_user_req.substr(hostPos + 6, domain_length);
+        cout<<"domain_name "<<domain_name<<endl;
         initial_user_req = initial_user_req.substr(first_ln_len+2, initial_user_req.length()); //Removing first line of request, redundant
         cout<<initial_user_req<<endl;
         //getting IP address from domain sent in by user

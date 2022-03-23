@@ -48,10 +48,10 @@ int MainServer::start() {
         if(iResult > 0) {
             printf("Bytes received: %d\n", iResult);
             userRequest+=string(recvbuf).substr(0, iResult);
-            cout<<userRequest<<endl;
             end = userRequest.find("\r\n\r\n");
             if(end == string::npos) continue; //If we don't have the entire get request, continue to next iteration and get more of it
             userCommand = parseGetReq(userRequest);
+            //cout<<userRequest<<endl;
             cout<<userCommand<<endl;
             if(userCommand == "INVALID") {
                 cout << "An invalid request was sent to the server" << endl;
@@ -77,7 +77,7 @@ int MainServer::start() {
                 InputNode inp1;
                 ExitNode exn1;
                 std::thread t1(&InputNode::initialize_server_socket, &inp1, "8081");
-                std::thread t2(&Node::initialize_server_socket, &inp1, "8087", "8080");
+                std::thread t2(&Node::initialize_server_socket, &n1, "8087", "8080");
                 std::thread t3(&ExitNode::initialize_server_socket, &exn1, "8080");
                 SOCKET connectSocket = SocketGetters::getConnectSocket("192.168.1.14", "8081");
                 iSendResult = send(connectSocket, userRequest.c_str(), userRequest.length(), 0);
