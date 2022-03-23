@@ -2,18 +2,13 @@
 // Created by xray2 on 14/03/2022.
 //
 
-#include "Node.h"
-#include "../security/model/Cryption.h"
-#include "../security/aes/Crypter.h"
-#include "../security/string-modifier/StringModifier.h"
 #include <iostream>
-#include <winsock2.h>
 #include <ws2tcpip.h>
-#include <regex>
+#include "InputNode.h"
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
-void Node::initialize_server_socket(const char *port_nr, const char *next_node_port) {
+void InputNode::initialize_server_socket(const char *port_nr) {
 
     SOCKET ListenSocket = getListenSocket(port_nr); //Making a socket listen on given port
 
@@ -21,7 +16,6 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
 
     // Accept a client socket
     ClientSocket = accept(ListenSocket, NULL, NULL);
-    cout << "PrevSocket connected" << endl;
     if (ClientSocket == INVALID_SOCKET) {
         printf("accept failed: %d\n", WSAGetLastError());
         closesocket(ListenSocket);
@@ -30,7 +24,6 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
     }
 
 #define DEFAULT_BUFLEN 512
-
     char recvbuf[DEFAULT_BUFLEN];
     int recvbuflen = DEFAULT_BUFLEN;
     int iResult;
@@ -41,20 +34,26 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
     // Receive until the peer shuts down the connection
     do {
         do {
-            iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
+            iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
             printf("Bytes received: %d\n", iStart);
-            initial_user_req += string(recvbuf).substr(0, iStart); //Gathering user request in a string
-            cout << recvbuf << endl << endl;
-            iResult = iStart;
+            initial_user_req += string(recvbuf).substr(0, iStart);
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
-        cout << "Received from prev: " << initial_user_req << "\n" << endl;
+        iResult = iStart;
+
+        //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
+        vector<string> parsed = parse_initial_request(initial_user_req); //Contains domain_name and path
+
+        //constructing a get request that the node will send to socket on internet
+        const char *get_req_ptr = construct_get_request(parsed.at(0), parsed.at(1)).c_str();
+        std::cout << get_req_ptr << std::endl;
+
 
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-
-            SOCKET web_page_socket = getConnectSocket("192.168.1.14", next_node_port); //TODO needs fix, ip MUST be more dynamic
-            iSendResult = send(web_page_socket, initial_user_req.c_str(), initial_user_req.length(), 0); //forwarding received message to next/server
+            SOCKET web_page_socket = getConnectSocket("192.168.1.14", "8087"); //TODO fix here to change which connection to forward to
+            cout << "connected to next, trying to send" << endl;
+            iSendResult = send(web_page_socket, get_req_ptr, (int) strlen(get_req_ptr), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());
                 closesocket(ClientSocket);
@@ -121,7 +120,7 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
     WSACleanup();
 }
 
-SOCKET Node::getConnectSocket(const char *ip, const char *port) {
+SOCKET InputNode::getConnectSocket(const char *ip, const char *port) {
     WSADATA wsaData;
     int iResult;
 
@@ -141,6 +140,7 @@ SOCKET Node::getConnectSocket(const char *ip, const char *port) {
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_protocol = IPPROTO_TCP;
 
+#define DEFAULT_TLS_PORT = "433"
 
     // Resolve the server address and port
     iResult = getaddrinfo(ip, port, &hints, &result);
@@ -177,7 +177,32 @@ SOCKET Node::getConnectSocket(const char *ip, const char *port) {
     return ConnectSocket;
 }
 
-SOCKET Node::getListenSocket(const char *port_nr){
+vector<string> InputNode::parse_initial_request(string req) {
+    int user_arg_end;
+    bool contains_path = false;
+    int path_length = 0;
+    string path;
+    for(user_arg_end = 5; req[user_arg_end] != ' '; user_arg_end++){
+        if(req[user_arg_end] == '/') contains_path = true;
+        if(contains_path) path_length++;
+    }
+    string domain_name = req.substr(5, user_arg_end - 5 - path_length); //Domain name always starts at position 5 in get request, then goes up to the length of the entire URL - path size - offset
+    if(contains_path) path = req.substr(1 + user_arg_end - path_length, path_length - 1); //Path starts right after /, therefore +1
+
+    vector<string> domain_and_path(2);
+    domain_and_path.at(0) = domain_name;
+    domain_and_path.at(1) = path;
+    return domain_and_path;
+}
+
+string InputNode::construct_get_request(string domain_name, string path) { //Constructs a modified GET request where the first line is the length of the domain and path separated by |
+    string get_req = to_string(domain_name.length())+ "|" + to_string(path.length()) + "\r\n" +
+                     "GET /" + path + " HTTP/1.1\r\nHost: " + domain_name +
+                     "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\nConnection: close\r\n\r\n";
+    return get_req;
+}
+
+SOCKET InputNode::getListenSocket(const char *port_nr) {
     WSAData wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
@@ -234,74 +259,4 @@ SOCKET Node::getListenSocket(const char *port_nr){
     }
 
     return ListenSocket;
-}
-
-
-string Node::buildString(Cryption &c){
-    string res = StringModifier::cryptionToString(c);
-    res += "|" + c.getRequestString();
-}
-
-Cryption Node::buildCryption(string message, string len){
-    vector<string> strings = StringModifier::splitString(message, 32);
-    vector<unsigned char*> strings2;
-    vector<int> string_len;
-    int numberOfBlocks;
-    string numblocks;
-    for(int i = 0; i < len.length(); i++){
-        if(len.at(i) == '|')
-            break;
-        numblocks += (len.at(i));
-    }
-
-    string lastBlock = numblocks.substr(numblocks.length()+4,len.length());
-    int lastBlockI = stoi(lastBlock);
-
-    numberOfBlocks = stoi(numblocks);
-
-    for(int i = 0; i < numberOfBlocks; i++){
-        string_len.emplace_back(32);
-        strings2.emplace_back(StringModifier::convertToCharArray(strings[i]));
-    }
-
-    string_len.emplace_back(lastBlockI);
-
-    return {strings2, string_len};
-}
-
-string Node::encrypt(string message) {
-    cout << StringModifier::BN2LLI(decryptKey.secretKey) << endl;
-    Cryption enc = Crypter::encrypt(message,StringModifier::BN2LLI(decryptKey.secretKey));
-    string encrypted;
-    for(int i = 0; i < enc.getRes().size(); i++){
-        for(int y = 0; y < enc.strings_len[i]; y++){
-            encrypted += enc.getRes()[i][y];
-        }
-    }
-    return encrypted;
-}
-
-Cryption Node::encryptC(string message) {
-    return Crypter::encrypt(message,StringModifier::BN2LLI(decryptKey.secretKey));
-}
-
-Cryption Node::encryptC(Cryption &c) {
-    return Crypter::encrypt(c,StringModifier::BN2LLI(decryptKey.secretKey));
-}
-
-string Node::decrypt(Cryption &message) {
-    long long int key = StringModifier::BN2LLI(encryptKey.secretKey);
-    cout << key << endl;
-    Cryption dec = Crypter::decrypt(message, key);
-    string decrypted;
-    for(int i = 0; i < dec.getRes().size(); i++){
-        for(int y = 0; y < dec.strings_len[i]; y++){
-            decrypted += dec.getRes()[i][y];
-        }
-    }
-    return decrypted;
-}
-
-Cryption Node::decryptC(vector<string> msg, vector<int> length) {
-    return Crypter::decrypt(message,length, StringModifier::BN2LLI(encryptKey.secretKey));
 }

@@ -24,6 +24,9 @@ public:
 
     const vector<Node> &getUserNodes() const;
 
+    Cryption encrypt(string text);
+
+    string decrypt(Cryption &c);
 };
 
 

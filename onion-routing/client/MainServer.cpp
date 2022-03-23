@@ -31,7 +31,7 @@ string MainServer::decrypt(Cryption &c) {
     vector<string> s;
     cr.push_back(c);
     for(int i = userNodes.size(); i > 0; i--){
-        text = userNodes[i].decryptC(cr[i-1].res, cr[i-1].strings_len);
+        text = userNodes[i].decrypt(cr,);
         cr.push_back(text);
     }
 }
