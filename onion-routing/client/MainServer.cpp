@@ -2,9 +2,11 @@
 // Created by xray2 on 14/03/2022.
 //
 
+#include <iostream>
 #include "MainServer.h"
 #include "../security/diffie-helman/Handshake.h"
 #include "../security/string-modifier/StringModifier.h"
+#include "../security/aes/Crypter.h"
 bool MainServer::generateKeys(){
     for(auto it = begin(userNodes); it != end(userNodes)-1; it++){
         long long int num = StringModifier::BN2LLI(Handshake::doHandshake(it->decryptKey, std::next(it)->encryptKey));
@@ -15,14 +17,12 @@ bool MainServer::generateKeys(){
 
 Cryption MainServer::encrypt(string text){
     vector<Cryption> c;
-    c.push_back(userNodes[0].encryptC(text));
-    if(userNodes.size() == 1)
-        return c[0];
+    c.push_back(Crypter::encrypt(text, keys[0]));
     for(int i = 1; i < userNodes.size()-1; i++){
-        c.push_back(userNodes[i].encryptC(c[i-1]));
+        c.push_back(Crypter::encrypt(c[i-1], keys[i]));
     }
 
-    return c[userNodes.size()-1];
+    return c[userNodes.size()-2];
 }
 
 string MainServer::decrypt(Cryption &c) {
@@ -30,10 +30,13 @@ string MainServer::decrypt(Cryption &c) {
     vector<Cryption> cr;
     vector<string> s;
     cr.push_back(c);
-    for(int i = userNodes.size(); i > 0; i--){
-        text = userNodes[i].decrypt(cr,);
+    int x = 0;
+    for(int i = userNodes.size()-2; i >= 0; i--){
+        text = Crypter::decrypt(cr[x], keys[i]);
         cr.push_back(text);
+        x++;
     }
+    return StringModifier::cryptionToString(cr[userNodes.size()-1]);
 }
 
 MainServer::MainServer(int numberOfNodes) {
@@ -48,3 +51,12 @@ const vector<Node> &MainServer::getUserNodes() const {
     return userNodes;
 }
 
+void MainServer::sendMessage(string message){
+    Cryption encrypted = encrypt(message);
+    receiveMessage(encrypted);
+}
+
+void MainServer::receiveMessage(Cryption &c){
+    string t = decrypt(c);
+    cout << t << endl;
+}

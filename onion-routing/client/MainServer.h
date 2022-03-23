@@ -11,7 +11,6 @@
 using namespace std;
 class MainServer {
 private:
-    vector<long long int> keys;
     Node node; //Byttes ut med socket
     vector<Node> userNodes;
 
@@ -21,12 +20,16 @@ private:
 
 public:
     MainServer(int numberOfNodes);
-
+    vector<long long int> keys;
     const vector<Node> &getUserNodes() const;
 
     Cryption encrypt(string text);
 
     string decrypt(Cryption &c);
+
+    void sendMessage(string message);
+
+    void receiveMessage(Cryption &c);
 };
 
 

@@ -300,6 +300,10 @@ Cryption Crypter::decrypt(Cryption &cryption, unsigned char* key) {
     return decryptString(cryption, key);
 }
 
-string Crypter::removePadding(string string1){
+unsigned long long int encryptDiff(char c, long long int key){
+    return key+c;
+}
 
+int decryptDiff(long long int crypted, long long int key){
+    crypted-key;
 }
