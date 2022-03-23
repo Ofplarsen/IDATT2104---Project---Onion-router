@@ -10,6 +10,38 @@
 
 
 
+string Node::buildString(Cryption &c){
+    string res = StringModifier::cryptionToString(c);
+    res += "|" + c.getRequestString();
+}
+
+Cryption Node::buildCryption(string message, string len){
+    vector<string> strings = StringModifier::splitString(message, 32);
+    vector<unsigned char*> strings2;
+    vector<int> string_len;
+    int numberOfBlocks;
+    string numblocks;
+    for(int i = 0; i < len.length(); i++){
+        if(len.at(i) == '|')
+            break;
+        numblocks += (len.at(i));
+    }
+
+    string lastBlock = numblocks.substr(numblocks.length()+4,len.length());
+    int lastBlockI = stoi(lastBlock);
+
+    numberOfBlocks = stoi(numblocks);
+
+    for(int i = 0; i < numberOfBlocks; i++){
+        string_len.emplace_back(32);
+        strings2.emplace_back(StringModifier::convertToCharArray(strings[i]));
+    }
+
+    string_len.emplace_back(lastBlockI);
+
+    return {strings2, string_len};
+}
+
 string Node::encrypt(string message) {
     cout << StringModifier::BN2LLI(decryptKey.secretKey) << endl;
     Cryption enc = Crypter::encrypt(message,StringModifier::BN2LLI(decryptKey.secretKey));

@@ -15,7 +15,7 @@
 #include <openssl/err.h>
 #include <string.h>
 #include <iostream>
-#define BLOCK_SIZE 16
+#define BLOCK_SIZE 32
 
 using namespace std;
 
@@ -33,7 +33,7 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
         exit(-1);
     }
 
-    if(!EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, NULL)){
+    if(!EVP_DecryptInit_ex(ctx, EVP_aes_128_ctr(), NULL, key, NULL)){
         perror("EVP_EncryptInit_ex");
         exit(-1);
     }
@@ -78,7 +78,7 @@ int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsi
         exit(-1);
     }
 
-    if(!EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, NULL)){
+    if(!EVP_EncryptInit_ex(ctx, EVP_aes_128_ctr(), NULL, key, NULL)){
         perror("EVP_EncryptInit_ex");
         EVP_CIPHER_CTX_cleanup(ctx);
         exit(-1);

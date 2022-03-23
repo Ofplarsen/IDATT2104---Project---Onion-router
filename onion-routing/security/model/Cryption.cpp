@@ -4,6 +4,7 @@
 
 #include "Cryption.h"
 
+
 const vector<int> &Cryption::getStringsLen() const {
     return strings_len;
 }
@@ -29,4 +30,9 @@ void Cryption::setStringsLen(const vector<int> &stringsLen) {
 
 void Cryption::setRes(const vector<unsigned char *> &res) {
     Cryption::res = res;
+}
+
+string Cryption::getRequestString(){
+    int len = strings_len.size();
+    return to_string(len) + "|" + to_string(strings_len[0]) + "|" + to_string(strings_len[len-1]);
 }

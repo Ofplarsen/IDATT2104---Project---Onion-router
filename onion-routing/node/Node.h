@@ -41,6 +41,10 @@ public:
     Cryption encryptC(Cryption &c);
 
     Cryption decryptC(vector<string> msg, vector<int> length);
+
+    Cryption buildCryption(string message, string len);
+
+    string buildString(Cryption &c);
 };
 
 
