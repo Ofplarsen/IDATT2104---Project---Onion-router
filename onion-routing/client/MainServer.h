@@ -17,8 +17,10 @@ private:
 
     bool generateKeys();
 
+    string decrypt();
+
 public:
-    MainServer();
+    MainServer(int numberOfNodes);
 
     const vector<Node> &getUserNodes() const;
 

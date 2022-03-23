@@ -13,15 +13,34 @@ bool MainServer::generateKeys(){
 
 }
 
-MainServer::MainServer() {
-    Node n1;
-    Node n2;
-    Node n3;
-    Node n4;
-    userNodes.push_back(n1);
-    userNodes.push_back(n2);
-    userNodes.push_back(n3);
-    userNodes.push_back(n4);
+Cryption MainServer::encrypt(string text){
+    vector<Cryption> c;
+    c.push_back(userNodes[0].encryptC(text));
+    if(userNodes.size() == 1)
+        return c[0];
+    for(int i = 1; i < userNodes.size()-1; i++){
+        c.push_back(userNodes[i].encryptC(c[i-1]));
+    }
+
+    return c[userNodes.size()-1];
+}
+
+string MainServer::decrypt(Cryption &c) {
+    Cryption text;
+    vector<Cryption> cr;
+    vector<string> s;
+    cr.push_back(c);
+    for(int i = userNodes.size(); i > 0; i--){
+        text = userNodes[i].decryptC(cr[i-1].res, cr[i-1].strings_len);
+        cr.push_back(text);
+    }
+}
+
+MainServer::MainServer(int numberOfNodes) {
+    for (int i = 0; i < numberOfNodes; i++) {
+        Node n;
+        userNodes.push_back(n);
+    }
     generateKeys();
 }
 

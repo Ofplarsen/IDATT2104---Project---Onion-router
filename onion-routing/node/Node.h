@@ -7,7 +7,7 @@
 
 
 #include <string>
-#include <winsock.h>
+
 #include "../security/key/Key.h"
 #include "../security/model/Cryption.h"
 
@@ -29,8 +29,6 @@ public:
     void connect();
 
     void initialize_server_socket(const char *port_nr, const char *next_node_port);
-    SOCKET getConnectSocket(const char *ip, const char *port);
-    SOCKET getListenSocket(const char *port_nr);
 
     Cryption encrypt(Cryption message);
 
@@ -43,6 +41,10 @@ public:
     Cryption encryptC(Cryption &c);
 
     Cryption decryptC(vector<string> msg, vector<int> length);
+
+    Cryption buildCryption(string message, string len);
+
+    string buildString(Cryption &c);
 };
 
 
