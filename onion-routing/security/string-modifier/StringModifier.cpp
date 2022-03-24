@@ -42,7 +42,7 @@ Cryption StringModifier::splitString(std::string string) {
     std::vector<unsigned char*> vector;
     std::vector<int> lengths;
     int length = string.length();
-    int intervals = length/16;
+    int intervals = length/32;
 
 
     for (auto i = 0; i < intervals; i++)
@@ -98,4 +98,15 @@ string StringModifier::BN2Str(BIGNUM *num){
     charNum = BN_bn2dec(dupNum);
 
     return string(charNum);
+}
+
+int StringModifier::getLengthOfLastBlock(string text){
+    int length = text.length();
+    int intervals = length/32;
+
+    if (text.length() % 32 != 0)
+    {
+        return text.substr(32 * intervals).length();
+    }
+    return 32;
 }

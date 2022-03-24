@@ -53,7 +53,6 @@ const vector<Node> &MainServer::getUserNodes() const {
 
 void MainServer::sendMessage(string message){
     Cryption encrypted = encrypt(message);
-    receiveMessage(encrypted);
 }
 
 void MainServer::receiveMessage(Cryption &c){

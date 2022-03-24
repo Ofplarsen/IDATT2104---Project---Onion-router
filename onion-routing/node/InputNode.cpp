@@ -51,7 +51,7 @@ void InputNode::initialize_server_socket(const char *port_nr) {
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET web_page_socket = getConnectSocket("192.168.1.14", "8087"); //TODO fix here to change which connection to forward to
+            SOCKET web_page_socket = getConnectSocket("192.168.10.100", "8087"); //TODO fix here to change which connection to forward to
             cout << "connected to next, trying to send" << endl;
             iSendResult = send(web_page_socket, get_req_ptr, (int) strlen(get_req_ptr), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {

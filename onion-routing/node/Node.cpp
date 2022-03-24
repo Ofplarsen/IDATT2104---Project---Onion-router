@@ -53,7 +53,7 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
             printf("Bytes received: %d\n", iResult);
 
 
-            SOCKET web_page_socket = getConnectSocket("192.168.1.14", next_node_port); //TODO needs fix, ip MUST be more dynamic
+            SOCKET web_page_socket = getConnectSocket("192.168.10.100", next_node_port); //TODO needs fix, ip MUST be more dynamic
             iSendResult = send(web_page_socket, initial_user_req.c_str(), initial_user_req.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());

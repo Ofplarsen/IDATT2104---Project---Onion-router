@@ -24,6 +24,8 @@ public:
     static long long int BN2LLI(BIGNUM *num);
 
     static Cryption splitString(string string);
+
+    static int getLengthOfLastBlock(string text);
 };
 
 
