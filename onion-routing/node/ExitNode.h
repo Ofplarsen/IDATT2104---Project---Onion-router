@@ -13,7 +13,6 @@
 #include <string.h>
 #include <ws2tcpip.h>
 
-#define PORT 8080
 
 #include "Node.h"
 #include <vector>
@@ -25,13 +24,7 @@ private:
 
 public:
     void sendGetRequest(const char *ip, const char *port);
-
     void initialize_server_socket(const char *listenPort);
-
-    SOCKET getListenSocket(const char *nr);
-
-
-    SOCKET getConnectSocket(const char *ip, const char *port);
 };
 
 

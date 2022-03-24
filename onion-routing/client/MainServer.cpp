@@ -80,7 +80,7 @@ int MainServer::start() {
                 std::thread t2(&Node::initialize_server_socket, &n1, "8087", "8080", localhost);
                 std::thread t3(&ExitNode::initialize_server_socket, &exn1, "8080");
 
-                SOCKET connectSocket = SocketGetters::getConnectSocket("192.168.1.14", "8081");
+                SOCKET connectSocket = SocketGetters::getConnectSocket(localhost, "8081");
                 iSendResult = send(connectSocket, userRequest.c_str(), userRequest.length(), 0);
                 if (iSendResult == SOCKET_ERROR) {
                     printf("HAPPENED IN MAINSERVER PLACE 1");
@@ -245,7 +245,7 @@ string MainServer::help(){
     return help;
 }
 
-string MainServer::notFound(){
+string MainServer::notFound(){ //TODO add error message?
     string notFound = "HTTP/1.0 404 Not Found\r\n"
                       "Connection: Close\r\n\r\n";
     return notFound;

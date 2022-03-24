@@ -19,6 +19,10 @@ private:
     Key private_key;
     Key public_key;
     string message;
+
+    const char *listenPort;
+    const char *connectPort;
+    const char *connectIp;
 public:
     Node *prevNode;
     Node *nextNode;
@@ -30,8 +34,6 @@ public:
     void connect();
 
     void initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp);
-    SOCKET getConnectSocket(const char *ip, const char *port);
-    SOCKET getListenSocket(const char *port_nr);
 };
 
 
