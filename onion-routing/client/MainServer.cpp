@@ -12,7 +12,7 @@
 #include "../security/string-modifier/StringModifier.h"
 #include "../security/aes/Crypter.h"
 
-
+#define localhost "192.168.10.100"
 bool MainServer::generateKeys(){
     for(auto it = begin(userNodes); it != end(userNodes)-1; it++){
         long long int num = StringModifier::BN2LLI(Handshake::doHandshake(it->decryptKey, std::next(it)->encryptKey));
@@ -45,34 +45,33 @@ string MainServer::decrypt(Cryption &c) {
     return StringModifier::cryptionToString(cr[userNodes.size()-1]);
 }
 
-MainServer::MainServer(int numberOfNodes) {
-    for (int i = 0; i < numberOfNodes; i++) {
-        Node n;
-        userNodes.push_back(n);
-    }
-    generateKeys();
-}
 
 const vector<Node> &MainServer::getUserNodes() const {
     return userNodes;
 }
 
-void MainServer::sendMessage(string message){
+string MainServer::sendMessage(string message){
     Cryption encrypted = encrypt(message);
+
+    string encryptedString = encrypted.getRequestString() += StringModifier::cryptionToString(encrypted);
+
+    //receiveMessage(encrypted);
+    return encryptedString;
 }
 
-void MainServer::receiveMessage(Cryption &c){
+string MainServer::receiveMessage(Cryption &c){
     string t = decrypt(c);
-    cout << t << endl;
+    return t;
 }
 
 //Websites for testing: www.example.com, www.softwareqatest.com, www.columbia.edu/~fdc/sample.html (something goes wrong here), www.virtu-software.com (something goes wrong here)
 
 int MainServer::start() {
     //create nodePool with x Nodes and give them their
+    nodeAmount = getNodeAmount(3, 12);
+    initNodes();
     //ask for nodeAmount, at least 3
-    nodeAmount = /*getNodeAmount(3, 12);*/ 3;
-    const char* localhost = "192.168.1.14";
+    generateKeys();
     //pick nodeAmount Nodes from pool
     //inform user about what to do next (log on with browser)
     cout << "Please go to your preferred browser and enter 'localhost:777' to begin using the program." << endl;
@@ -127,14 +126,28 @@ int MainServer::start() {
             }
             //if user sends in something else than preprogrammed cases, send to InputNode from userNodes vector and hope for the best
             else if(regex_match(userCommand, pattern)){
+                for(int i = 0; i < userNodes.size(); i++){
+                    userNodes[i].printError();
+                }
+//                std::thread t1(&InputNode::receiveAndSend, &userInputNode);
+//                std::thread t2(&Node::receiveAndSend, &userNodes[1]);
+//                std::thread t3(&ExitNode::receiveAndSend, &userExitNode);
                 Node n1;
                 InputNode inp1;
                 ExitNode exn1;
-                std::thread t1(&InputNode::initialize_server_socket, &inp1, "8081", "8087", localhost);
-                std::thread t2(&Node::initialize_server_socket, &n1, "8087", "8080", localhost);
-                std::thread t3(&ExitNode::initialize_server_socket, &exn1, "8080");
+                std::thread t1(&InputNode::initialize_server_socket, &userInputNode, "8081", "8087", localhost);
+                std::thread t2(&Node::initialize_server_socket, &userNodes[1], "8087", "8080", localhost);
+                std::thread t3(&ExitNode::initialize_server_socket, &userExitNode, "8080");
 
-                SOCKET connectSocket = SocketGetters::getConnectSocket("192.168.1.14", "8081");
+                SOCKET connectSocket = SocketGetters::getConnectSocket("192.168.10.100", "8081");
+
+                userRequest = sendMessage(userRequest);
+
+                vector<string> parsed = InputNode::parse_initial_request(userRequest); //Contains domain_name and path
+
+                //constructing a get request that the node will send to socket on internet
+                string getReq = InputNode::construct_get_request(parsed.at(0), parsed.at(1));
+
                 iSendResult = send(connectSocket, userRequest.c_str(), userRequest.length(), 0);
                 if (iSendResult == SOCKET_ERROR) {
                     printf("HAPPENED IN MAINSERVER PLACE 1");
@@ -148,6 +161,7 @@ int MainServer::start() {
                 string response; //Gathering all response information in a string
                 do {
                     iResult = recv(connectSocket, recvbuf, recvbuflen, 0); //Receiving from nextNode
+
                     //string recBufStr(recvbuf);
                     //cout<<recBufStr<<endl;
                     //if(recBufStr.find("</html>") != string::npos) break; //Found end of html, breaking loop
@@ -160,6 +174,23 @@ int MainServer::start() {
                     else
                         printf("recv failed: %d\n", WSAGetLastError());
                 } while (iResult > 0);
+                size_t end;
+                string info;
+
+                end = response.find("\r\n");
+                if(end != string::npos){
+                    info = response.substr(0, end);
+                    response = response.substr(end+2, response.length());
+                }
+                vector<int> sizes = split(info);
+                response= response.substr(0, sizes[0]*sizes[1]+sizes[2]); //TODO MEM?
+
+
+                Cryption cre = StringModifier::splitString(response);
+
+                cre.strings_len = StringModifier::getVector(sizes[0],sizes[1],sizes[2]);
+
+                response = receiveMessage(cre);
 
                 //Extracting content length from header
                 size_t contLenPos = response.find("Content-Length: "); //Find position of string
@@ -304,3 +335,38 @@ string MainServer::notFound(){
                       "Connection: Close\r\n\r\n";
     return notFound;
 }
+
+void MainServer::initNodes(){
+    userNodes.push_back(InputNode("8081", "8087", "192.168.10.100"));
+
+    for(int i = 0; i < nodeAmount-2; i++){
+        userNodes.push_back(Node("8087", "8080", "192.168.10.100"));
+    }
+    ExitNode exn1("8080", "0" ,"0");
+    userNodes.push_back(exn1);
+}
+
+vector<int> MainServer::split(string s){
+    vector<int> info;
+    std::string delimiter = "|";
+
+    size_t pos = 0;
+    std::string token = "";
+    int x = 0;
+    while ((pos = s.find(delimiter)) != std::string::npos) {
+        token = s.substr(token.length()+x, pos);
+        info.push_back(stoi(token));
+
+        if(x==4)
+            break;
+
+        if(x == 1){
+            x = 4;
+        }else if(x == 0){
+            x = 1;
+        }
+
+    }
+    return info;
+}
+

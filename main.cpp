@@ -15,20 +15,24 @@
 
 int main(int argc, char const *argv[]){
 
-    MainServer main(3);
-    vector<Node> nodes = main.getUserNodes();
-
-    std::string text = "Lorem ipsum dolor sit amet, consectetuer iculus mus. Donec quamlis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, ";
-    main.sendMessage(text);
-    vector<string> s = StringModifier::splitString(text, 32);
-    string d = nodes[0].encrypt(text);
-    string f = nodes[1].encrypt(d);
-    Cryption sd = Crypter::encrypt(text, main.keys[0]);
-    Cryption sdd = Crypter::encrypt(text, main.keys[1]);
-    cout << StringModifier::getLengthOfLastBlock(text) << endl;
-    cout << StringModifier::getLengthOfLastBlock(d) << endl;
-    cout << StringModifier::getLengthOfLastBlock(f) << endl;
-    cout << StringModifier::getLengthOfLastBlock(f) << endl;
+    MainServer mains;
+    mains.start();
+//    vector<Node> nodes = main.getUserNodes();
+//
+//    std::string text = "Lorem ipsum dolor sit amet, consectetuer iculus mus. Donec quamlis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, ";
+//    main.sendMessage(text);
+//    vector<string> s = StringModifier::splitString(text, 32);
+//    string d = nodes[0].encrypt(text);
+//    string f = nodes[1].encrypt(d);
+//    string fa = nodes[2].encrypt(f);
+//    Cryption sd = Crypter::encrypt(text, main.keys[0]);
+//    Cryption sdd = Crypter::encrypt(text, main.keys[1]);
+//    cout << StringModifier::getLengthOfLastBlock(text) << endl;
+//    cout << StringModifier::getLengthOfLastBlock(d) << endl;
+//    cout << StringModifier::getLengthOfLastBlock(f) << endl;
+//    cout << StringModifier::getLengthOfLastBlock(fa) << endl;
+//    Node n;
+//    vector<int> t = n.split("653|32|122313");
     //    Cryption c, t;
 //    c = Crypter::encrypt("Test strin to encrypt", main.keys[0]);
 //    c = Crypter::encrypt(c, main.keys[1]);

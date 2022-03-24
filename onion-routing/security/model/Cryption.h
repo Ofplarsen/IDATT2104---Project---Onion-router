@@ -43,6 +43,7 @@ public:
     void setRes(const vector<unsigned char *> &res);
 
     string getRequestString();
+    int getLength();
 };
 
 

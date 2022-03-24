@@ -26,6 +26,8 @@ public:
     static Cryption splitString(string string);
 
     static int getLengthOfLastBlock(string text);
+
+    static vector<int> getVector(int num, int size, int offset);
 };
 
 

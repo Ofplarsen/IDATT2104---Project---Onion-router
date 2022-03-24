@@ -47,14 +47,14 @@ Cryption StringModifier::splitString(std::string string) {
 
     for (auto i = 0; i < intervals; i++)
     {
-        c.res.push_back(convertToCharArray(string.substr(i * 16, 16)));
-        c.strings_len.push_back(16);
+        c.res.push_back(convertToCharArray(string.substr(i * 32, 32)));
+        c.strings_len.push_back(32);
     }
 
-    if (string.length() % 16 != 0)
+    if (string.length() % 32 != 0)
     {
-        int l = string.substr(16 * intervals).length();
-        c.res.push_back(convertToCharArray(string.substr(16 * intervals)));
+        int l = string.substr(32 * intervals).length();
+        c.res.push_back(convertToCharArray(string.substr(32 * intervals)));
         c.strings_len.push_back(l);
     }
 
@@ -109,4 +109,13 @@ int StringModifier::getLengthOfLastBlock(string text){
         return text.substr(32 * intervals).length();
     }
     return 32;
+}
+
+vector<int> StringModifier::getVector(int num, int size, int offset){
+    vector<int> v;
+    for (int i = 0; i < num; ++i) {
+        v.push_back(size);
+    }
+    v.push_back(offset);
+    return v;
 }

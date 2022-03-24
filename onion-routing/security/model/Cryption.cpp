@@ -10,7 +10,7 @@ const vector<int> &Cryption::getStringsLen() const {
 }
 
 Cryption::Cryption(vector<unsigned char *> strings, vector<int> stringsLen) {
-    strings = strings;
+    res = strings;
     strings_len = stringsLen;
 }
 
@@ -34,5 +34,11 @@ void Cryption::setRes(const vector<unsigned char *> &res) {
 
 string Cryption::getRequestString(){
     int len = strings_len.size();
-    return to_string(len) + "|" + to_string(strings_len[0]) + "|" + to_string(strings_len[len-1]);
+    return to_string(len) + "|" + to_string(strings_len[0]) + "|" + to_string(strings_len[len-1])+"\r\n";
+}
+
+int Cryption::getLength() {
+    int l = (strings_len.size()-1)*32;
+    l += strings_len[strings_len.size()-1];
+    return l;
 }

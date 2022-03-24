@@ -15,16 +15,22 @@
 using namespace std;
 
 class Node {
+protected:
+    const char *listenPort;
+    const char *connectPort;
+    const char *connectIp;
 private:
 
-    Key private_key;
-    Key public_key;
     string message;
 public:
+    Node();
+    Node(const char *listenPort, const char *connectPort, const char *connectIp){
+        this->listenPort = listenPort;
+        this->connectPort = connectPort;
+        this->connectIp = connectIp;
+    }
     Key encryptKey;
     Key decryptKey;
-    Node *prevNode;
-    Node *nextNode;
     string encrypt(string message);
     string decrypt(string message);
     string get_public_key();
@@ -52,6 +58,12 @@ public:
     Cryption buildCryption(string message, string len);
 
     string buildString(Cryption &c);
+
+    vector<int> split(string s);
+
+    void receiveAndSend();
+
+    void printError();
 };
 
 

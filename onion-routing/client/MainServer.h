@@ -14,6 +14,8 @@ using namespace std;
 class MainServer {
 private:
     Node node; //Byttes ut med socket
+    InputNode userInputNode;
+    ExitNode userExitNode;
     vector<Node> userNodes;
 
     bool generateKeys();
@@ -27,8 +29,8 @@ private:
     SOCKET forward; //Used to forward information to Nodes
 
     int nodeAmount; //Amount of nodes
+    void initNodes();
 public:
-    MainServer(int numberOfNodes);
     vector<long long int> keys;
     const vector<Node> &getUserNodes() const;
 
@@ -44,9 +46,12 @@ public:
 
     string decrypt(Cryption &c);
 
-    void sendMessage(string message);
+    string sendMessage(string message);
 
-    void receiveMessage(Cryption &c);
+    string receiveMessage(Cryption &c);
+
+    vector<int> split(string s);
+
 };
 
 
