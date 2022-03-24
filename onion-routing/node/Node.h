@@ -36,7 +36,6 @@ public:
     SOCKET getConnectSocket(const char *ip, const char *port);
     SOCKET getListenSocket(const char *port_nr);
 
-    void initialize_server_socket(const char *port_nr, const char *next_node_port);
 
     Cryption encrypt(Cryption message);
 

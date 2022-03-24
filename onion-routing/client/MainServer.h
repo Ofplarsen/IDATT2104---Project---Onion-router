@@ -27,8 +27,6 @@ private:
     SOCKET forward; //Used to forward information to Nodes
 
     int nodeAmount; //Amount of nodes
-    vector <Node> userNodes;
-    vector <Key> keys;
 public:
     MainServer(int numberOfNodes);
     vector<long long int> keys;
@@ -36,7 +34,6 @@ public:
 
     Cryption encrypt(string text);
 
-    void generateKeys();
     int start();
     string parseGetReq(string req);
     int getNodeAmount(int min, int max);

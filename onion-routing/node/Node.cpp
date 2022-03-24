@@ -40,7 +40,6 @@ void Node::initialize_server_socket(const char *listenPort, const char *connectP
     string initial_user_req;
 
     // Receive until the peer shuts down the connection
-    char recvbuf[DEFAULT_BUFLEN];
     do {
 
         string initial_user_req;

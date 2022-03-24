@@ -38,7 +38,6 @@ public:
 
     static Cryption encrypt(Cryption &c, long long int key);
 
-    static string removePadding(string string1);
 };
 
 

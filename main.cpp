@@ -28,6 +28,7 @@ int main(int argc, char const *argv[]){
     cout << StringModifier::getLengthOfLastBlock(text) << endl;
     cout << StringModifier::getLengthOfLastBlock(d) << endl;
     cout << StringModifier::getLengthOfLastBlock(f) << endl;
+    cout << StringModifier::getLengthOfLastBlock(f) << endl;
     //    Cryption c, t;
 //    c = Crypter::encrypt("Test strin to encrypt", main.keys[0]);
 //    c = Crypter::encrypt(c, main.keys[1]);
