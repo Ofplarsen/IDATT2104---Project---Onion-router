@@ -28,6 +28,7 @@ void InputNode::initialize_server_socket(const char *listenPort, const char *con
     int iResult;
     int iSendResult;
     int iStart;
+    string initial_user_req;
 
     // Receive until the peer shuts down the connection
     char recvbuf[DEFAULT_BUFLEN];

@@ -18,6 +18,14 @@ public:
     static std::vector<std::string> splitString(std::string string, int splitLength);
     static unsigned char* convertToCharArray(std::string text);
     static std::string cryptionToString(Cryption &cryption);
+
+    static string BN2Str(BIGNUM *num);
+
+    static long long int BN2LLI(BIGNUM *num);
+
+    static Cryption splitString(string string);
+
+    static int getLengthOfLastBlock(string text);
 };
 
 

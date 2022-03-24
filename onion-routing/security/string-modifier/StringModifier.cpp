@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <openssl/bn.h>
 #include "StringModifier.h"
 
 unsigned char* StringModifier::convertToCharArray(long long int a)
@@ -36,6 +37,30 @@ std::vector<std::string> StringModifier::splitString(std::string string, int spl
     return vector;
 }
 
+Cryption StringModifier::splitString(std::string string) {
+    Cryption c;
+    std::vector<unsigned char*> vector;
+    std::vector<int> lengths;
+    int length = string.length();
+    int intervals = length/32;
+
+
+    for (auto i = 0; i < intervals; i++)
+    {
+        c.res.push_back(convertToCharArray(string.substr(i * 16, 16)));
+        c.strings_len.push_back(16);
+    }
+
+    if (string.length() % 16 != 0)
+    {
+        int l = string.substr(16 * intervals).length();
+        c.res.push_back(convertToCharArray(string.substr(16 * intervals)));
+        c.strings_len.push_back(l);
+    }
+
+    return c;
+}
+
 unsigned char *StringModifier::convertToCharArray(std::string text) {
     return (unsigned char*) text.c_str();
 }
@@ -50,4 +75,38 @@ std::string StringModifier::cryptionToString(Cryption &cryption) {
         }
     }
     return returnString;
+}
+
+long long int StringModifier::BN2LLI(BIGNUM *num){
+    BIGNUM *dupNum;
+    dupNum = BN_dup(num);
+
+    char* charNum;
+
+    charNum = BN_bn2dec(dupNum);
+    string strNum = string(charNum);
+    BN_free(dupNum);
+    return stoll(strNum, nullptr, 10);
+}
+
+string StringModifier::BN2Str(BIGNUM *num){
+    BIGNUM *dupNum;
+    dupNum = BN_dup(num);
+
+    char* charNum;
+
+    charNum = BN_bn2dec(dupNum);
+
+    return string(charNum);
+}
+
+int StringModifier::getLengthOfLastBlock(string text){
+    int length = text.length();
+    int intervals = length/32;
+
+    if (text.length() % 32 != 0)
+    {
+        return text.substr(32 * intervals).length();
+    }
+    return 32;
 }

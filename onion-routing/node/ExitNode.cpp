@@ -2,6 +2,8 @@
 // Created by xray2 on 14/03/2022.
 //
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include "ExitNode.h"
 
 void ExitNode::sendGetRequest(const char *ip, const char *port) {

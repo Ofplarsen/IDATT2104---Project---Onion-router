@@ -13,6 +13,12 @@
 using namespace std;
 class MainServer {
 private:
+    Node node; //Byttes ut med socket
+    vector<Node> userNodes;
+
+    bool generateKeys();
+
+    string decrypt();
     vector <InputNode> inputNodePool; //Amount: 5
     vector <Node> nodePool; //Amount: 10
     vector <ExitNode> exitNodePool; //Amount: 5
@@ -24,6 +30,11 @@ private:
     vector <Node> userNodes;
     vector <Key> keys;
 public:
+    MainServer(int numberOfNodes);
+    vector<long long int> keys;
+    const vector<Node> &getUserNodes() const;
+
+    Cryption encrypt(string text);
 
     void generateKeys();
     int start();
@@ -33,6 +44,12 @@ public:
     string help();
 
     string notFound();
+
+    string decrypt(Cryption &c);
+
+    void sendMessage(string message);
+
+    void receiveMessage(Cryption &c);
 };
 
 

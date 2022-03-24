@@ -25,6 +25,7 @@ public:
      */
     vector <unsigned char*> res;
 
+
     //Cryption(const vector <string> &strings);
 
     const vector<int> &getStringsLen() const;
@@ -40,6 +41,8 @@ public:
     void setStringsLen(const vector<int> &stringsLen);
 
     void setRes(const vector<unsigned char *> &res);
+
+    string getRequestString();
 };
 
 

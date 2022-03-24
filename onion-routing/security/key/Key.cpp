@@ -3,14 +3,14 @@
 //
 #include "Key.h"
 #include "../diffie-helman/SC.h"
-#define P 1786534726771898
-#define G 1234567890123
 
+#define G 134547571
+#define P 217436006305459749
 /**
  * Generates a key by using publicG, private and P key
  * @return
  */
-unsigned long long int Key::generateKey(){
+BIGNUM * Key::generateKey(){
     generatedKey = SC::power(publicKeyG, privateKey ,publicKeyP);
     return generatedKey;
 };
@@ -20,40 +20,23 @@ unsigned long long int Key::generateKey(){
  * @param generatedKey
  * @return
  */
-unsigned long long int Key::getSecretKey(long long int generatedKey){
+BIGNUM * Key::getSecretKey(BIGNUM *generatedKey){
         secretKey = SC::power(generatedKey, privateKey, publicKeyP);
         return secretKey;
     };
 
-unsigned long long int Key::getPrivateKey() const {
-    return privateKey;
-}
 
-void Key::setPrivateKey(long long int privateKey) {
-    Key::privateKey = privateKey;
-}
-
-unsigned long long int Key::getPublicKeyP() const {
-    return publicKeyP;
-}
-
-void Key::setPublicKeyP(long long int publicKeyP) {
-    Key::publicKeyP = publicKeyP;
-}
-
-unsigned long long int Key::getPublicKeyG() const {
-    return publicKeyG;
-}
-
-void Key::setPublicKeyG(long long int publicKeyG) {
-    Key::publicKeyG = publicKeyG;
-}
 /**
  * Constructor that inits the keys with standard values, and a random prime private key
  */
 Key::Key() {
     privateKey = SC::generatePrivateKey();
-    publicKeyP = P;
-    publicKeyG = G;
+    publicKeyP = BN_new();
+    BN_set_word(publicKeyP, P);
+    publicKeyG = BN_new();
+    BN_set_word(publicKeyG, G);
 }
+
+
+
 

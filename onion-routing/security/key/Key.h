@@ -5,37 +5,31 @@
 #ifndef IDATT2104___PROJECT___ONION_ROUTER_KEY_H
 #define IDATT2104___PROJECT___ONION_ROUTER_KEY_H
 
+#include <stdio.h>
+#include <openssl/dh.h>
+#include <openssl/bn.h>
+
 /**
  * Class that hold public, private, gen, and secret keys for node
  */
 class Key {
 private:
-    unsigned long long int privateKey;
-    unsigned long long int publicKeyP;
-    unsigned long long int publicKeyG;
-    unsigned long long int generatedKey;
-    unsigned long long int secretKey;
-
+    BIGNUM *privateKey;
+    BIGNUM *publicKeyP;
+    BIGNUM *publicKeyG;
+    BIGNUM *generatedKey;
 
 public:
+    BIGNUM *secretKey;
     Key();
 
-    unsigned long long int generateKey();
-    unsigned long long int getSecretKey(long long int generatedKey);
-
-    unsigned long long int getPrivateKey() const;
-
-    void setPrivateKey(long long int privateKey);
-
-    unsigned long long int getPublicKeyP() const;
-
-    void setPublicKeyP(long long int publicKeyP);
-
-    unsigned long long int getPublicKeyG() const;
-
-    void setPublicKeyG(long long int publicKeyG);
+    BIGNUM * generateKey();
+    //unsigned long long int getSecretKey(long long int generatedKey);
 
 
+    BIGNUM * getSecretKey(BIGNUM *generatedKey);
+
+    BIGNUM *getSecretKey1() const;
 };
 
 

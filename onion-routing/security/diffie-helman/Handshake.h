@@ -12,10 +12,10 @@
  */
 class Handshake {
 private:
-    static void doHandshake(Key &k1, Key &k2);
 public:
     static bool doHandshake(Node n1, Node n2);
 
+    static BIGNUM *doHandshake(Key &k1, Key &k2);
 };
 
 
