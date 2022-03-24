@@ -139,9 +139,9 @@ void ExitNode::sendGetRequest(const char *ip, const char *port) {
 
 }
 
-void ExitNode::initialize_server_socket(const char *port_nr) {
+void ExitNode::initialize_server_socket(const char *listenPort) {
 
-    SOCKET ListenSocket = getListenSocket(port_nr); //Making a socket listen on given port
+    SOCKET ListenSocket = getListenSocket(listenPort); //Making a socket listen on given port
 
     SOCKET ClientSocket = INVALID_SOCKET;
 
@@ -186,13 +186,12 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
         if(path_length == 0) path_length = -1;
 
         cout << "Domain length: " <<domain_length << " Path length: " << path_length << endl;
-        //string domain_name = initial_user_req.substr(29 + path_length, domain_length); //TODO needs polishing, not very dynamic
-        //cout<<"Take one "<<domain_name<<endl;
         size_t hostPos = initial_user_req.find("Host: ");
         string domain_name = initial_user_req.substr(hostPos + 6, domain_length);
         cout<<"domain_name "<<domain_name<<endl;
-        initial_user_req = initial_user_req.substr(first_ln_len+2, initial_user_req.length()); //Removing first line of request, redundant
-        cout<<initial_user_req<<endl;
+        initial_user_req = initial_user_req.substr(first_ln_len + 2, initial_user_req.length()); //Removing first line of request, no longer any need
+        //cout << initial_user_req << endl;
+
         //getting IP address from domain sent in by user
         hostent *webDomain = gethostbyname(domain_name.c_str());
         in_addr *addr; //To get  char  version of ip: inet_ntoa(*addr)
@@ -204,7 +203,7 @@ void ExitNode::initialize_server_socket(const char *port_nr) {
 
             addr = reinterpret_cast<in_addr*>(temp);
         }
-        cout<<inet_ntoa(*addr)<<endl;
+        //cout<<inet_ntoa(*addr)<<endl;
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 

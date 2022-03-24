@@ -5,12 +5,14 @@
 #include "onion-routing/security/aes/Crypter.h"
 #include "onion-routing/security/model/Cryption.h"
 #include "onion-routing/security/string-modifier/StringModifier.h"
+#include "onion-routing/socket/SocketGetters.h"
 #include <vector>
 
 
 #define P 1786534726771898
 #define G 1234567890123
 int main(int argc, char const *argv[]){
+
     MainServer s;
     s.start();
 

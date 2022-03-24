@@ -9,6 +9,7 @@
 #include <string>
 #include <winsock.h>
 #include "../security/key/Key.h"
+#include "../socket/SocketGetters.h"
 
 using namespace std;
 
@@ -28,7 +29,7 @@ public:
     void receive_message(string message);
     void connect();
 
-    void initialize_server_socket(const char *port_nr, const char *next_node_port);
+    void initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp);
     SOCKET getConnectSocket(const char *ip, const char *port);
     SOCKET getListenSocket(const char *port_nr);
 };

@@ -5,9 +5,11 @@
 #include <iostream>
 #include <ws2tcpip.h>
 #include "SocketGetters.h"
+#include <winsock2.h>
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
+using namespace std;
 SOCKET SocketGetters::getConnectSocket(const char *ip, const char *port) {
     WSADATA wsaData;
     int iResult;
@@ -68,7 +70,7 @@ SOCKET SocketGetters::getListenSocket(const char *port_nr){
     WSAData wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-    std::cout << "Initializing winosck..." << std::endl;
+    //std::cout << "Initializing winosck..." << std::endl;
     if (iResult != 0) {
         std::cout << "Something went wrong " << WSAGetLastError() << std::endl;
         return NULL;
@@ -121,4 +123,24 @@ SOCKET SocketGetters::getListenSocket(const char *port_nr){
     }
 
     return ListenSocket;
+}
+
+char* SocketGetters::getLocalhostIP(){
+   WSADATA wsaData;
+    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (iResult != 0) {
+        std::cout << "Something went wrong " << WSAGetLastError() << std::endl;
+        return NULL;
+    }
+
+    char host[256];
+    char *ip;
+    struct hostent *host_entry;
+    if((host_entry = gethostbyname(host)) == NULL){ //find host information
+        cout<<"Something went wrong getting host by name"<<endl;
+    }
+    ip = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[0])); //Convert ip to string
+
+    WSACleanup();
+    return ip;
 }

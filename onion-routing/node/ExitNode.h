@@ -26,7 +26,7 @@ private:
 public:
     void sendGetRequest(const char *ip, const char *port);
 
-    void initialize_server_socket(const char *port_nr);
+    void initialize_server_socket(const char *listenPort);
 
     SOCKET getListenSocket(const char *nr);
 

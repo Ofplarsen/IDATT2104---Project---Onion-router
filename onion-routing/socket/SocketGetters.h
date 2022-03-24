@@ -12,6 +12,8 @@ class SocketGetters {
 public:
     static SOCKET getConnectSocket(const char *ip, const char *port);
     static SOCKET getListenSocket(const char *port_nr);
+
+    static char *getLocalhostIP();
 };
 
 

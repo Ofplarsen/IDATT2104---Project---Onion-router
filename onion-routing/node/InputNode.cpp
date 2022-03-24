@@ -8,9 +8,9 @@
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
-void InputNode::initialize_server_socket(const char *port_nr) {
+void InputNode::initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp) {
 
-    SOCKET ListenSocket = getListenSocket(port_nr); //Making a socket listen on given port
+    SOCKET ListenSocket = getListenSocket(listenPort); //Making a socket listen on given port
 
     SOCKET ClientSocket = INVALID_SOCKET;
 
@@ -48,7 +48,7 @@ void InputNode::initialize_server_socket(const char *port_nr) {
         string getReq = construct_get_request(parsed.at(0), parsed.at(1));
 
         if (iResult > 0) {
-            SOCKET web_page_socket = getConnectSocket("192.168.1.14", "8087"); //TODO fix here to change which connection to forward to
+            SOCKET web_page_socket = getConnectSocket(connectIp, connectPort); //TODO fix here to change which connection to forward to
             cout << "connected to next, trying to send" << endl;
             iSendResult = send(web_page_socket, getReq.c_str(), getReq.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {

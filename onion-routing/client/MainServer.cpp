@@ -18,6 +18,7 @@ int MainServer::start() {
     //create nodePool with x Nodes and give them their
     //ask for nodeAmount, at least 3
     nodeAmount = /*getNodeAmount(3, 12);*/ 3;
+    const char* localhost = "192.168.1.14";
     //pick nodeAmount Nodes from pool
     //inform user about what to do next (log on with browser)
     cout << "Please go to your preferred browser and enter 'localhost:777' to begin using the program." << endl;
@@ -37,7 +38,6 @@ int MainServer::start() {
     int recvbuflen = DEFAULT_BUFLEN;
     string userCommand;
     string userRequest;
-
 
     // Receive until the peer shuts down the connection
     char recvbuf[DEFAULT_BUFLEN];
@@ -76,9 +76,10 @@ int MainServer::start() {
                 Node n1;
                 InputNode inp1;
                 ExitNode exn1;
-                std::thread t1(&InputNode::initialize_server_socket, &inp1, "8081");
-                std::thread t2(&Node::initialize_server_socket, &n1, "8087", "8080");
+                std::thread t1(&InputNode::initialize_server_socket, &inp1, "8081", "8087", localhost);
+                std::thread t2(&Node::initialize_server_socket, &n1, "8087", "8080", localhost);
                 std::thread t3(&ExitNode::initialize_server_socket, &exn1, "8080");
+
                 SOCKET connectSocket = SocketGetters::getConnectSocket("192.168.1.14", "8081");
                 iSendResult = send(connectSocket, userRequest.c_str(), userRequest.length(), 0);
                 if (iSendResult == SOCKET_ERROR) {

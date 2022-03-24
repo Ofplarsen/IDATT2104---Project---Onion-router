@@ -10,9 +10,9 @@
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
-void Node::initialize_server_socket(const char *port_nr, const char *next_node_port) {
+void Node::initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp) {
 
-    SOCKET ListenSocket = getListenSocket(port_nr); //Making a socket listen on given port
+    SOCKET ListenSocket = getListenSocket(listenPort); //Making a socket listen on given port
 
     SOCKET ClientSocket = INVALID_SOCKET;
 
@@ -50,8 +50,7 @@ void Node::initialize_server_socket(const char *port_nr, const char *next_node_p
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-
-            SOCKET web_page_socket = getConnectSocket("192.168.1.14", next_node_port); //TODO needs fix, ip MUST be more dynamic
+            SOCKET web_page_socket = getConnectSocket(connectIp, connectPort);
             iSendResult = send(web_page_socket, initial_user_req.c_str(), initial_user_req.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("HAPPENED IN NODE PLACE 1");
