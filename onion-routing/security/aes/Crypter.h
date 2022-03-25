@@ -8,7 +8,9 @@
 
 #include <string>
 #include "../model/Cryption.h"
-
+/**
+ * Class for performing encryption and decryption. Uses AES_128 (OpenSSL lib)
+ */
 class Crypter {
 private:
     static int decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, unsigned char* text);

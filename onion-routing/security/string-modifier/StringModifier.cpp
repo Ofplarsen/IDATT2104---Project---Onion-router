@@ -6,19 +6,12 @@
 #include <cstring>
 #include <openssl/bn.h>
 #include "StringModifier.h"
-
-unsigned char* StringModifier::convertToCharArray(long long int a)
-{
-    unsigned char* arr;
-    int i = 0;
-
-    for (i = 0; i < 8; ++i)
-    {
-        arr[i] = (unsigned char)((((unsigned long long) a) >> (56 - (8*i))) & 0xFFu);
-    }
-    return arr;
-}
-
+/**
+ * Splits a string into given length and returns a vector with the strings
+ * @param string
+ * @param splitLength
+ * @return
+ */
 std::vector<std::string> StringModifier::splitString(std::string string, int splitLength) {
     std::vector<std::string> vector;
     int length = string.length();
@@ -36,7 +29,11 @@ std::vector<std::string> StringModifier::splitString(std::string string, int spl
 
     return vector;
 }
-
+/**
+ * Splits a string into blocks of 32, and returns custom object Cryption which contains info about length of string and length of blocks
+ * @param string
+ * @return
+ */
 Cryption StringModifier::splitString(std::string string) {
     Cryption c;
     std::vector<unsigned char*> vector;
@@ -81,12 +78,20 @@ Cryption StringModifier::splitString(std::string string) {
 
     return c;
 }
-
+/**
+ * Converts a string into a charArray
+ * @param text
+ * @return
+ */
 unsigned char *StringModifier::convertToCharArray(std::string text) {
     return (unsigned char*) text.c_str();
 }
 
-
+/**
+ * Takes object of type Cryption and returns a string with all strings saved in Cryption object
+ * @param cryption
+ * @return
+ */
 std::string StringModifier::cryptionToString(Cryption &cryption) {
 
     string returnString;
@@ -97,7 +102,11 @@ std::string StringModifier::cryptionToString(Cryption &cryption) {
     }
     return returnString;
 }
-
+/**
+ * Takes in a BIGNUM (OpenSSL) and returns a long long int. Used for keys
+ * @param num
+ * @return
+ */
 long long int StringModifier::BN2LLI(BIGNUM *num){
     BIGNUM *dupNum = BN_new();
     BN_copy(dupNum,num);
@@ -108,7 +117,11 @@ long long int StringModifier::BN2LLI(BIGNUM *num){
     string strNum = string(charNum);
     return stoll(strNum, nullptr, 10);
 }
-
+/**
+ * Takes in BIGNUM, returns number as string
+ * @param num
+ * @return
+ */
 string StringModifier::BN2Str(BIGNUM *num){
     BIGNUM *dupNum;
     dupNum = BN_dup(num);
@@ -120,17 +133,13 @@ string StringModifier::BN2Str(BIGNUM *num){
     return string(charNum);
 }
 
-int StringModifier::getLengthOfLastBlock(string text){
-    int length = text.length();
-    int intervals = length/32;
-
-    if (text.length() % 32 != 0)
-    {
-        return text.substr(32 * intervals).length();
-    }
-    return 32;
-}
-
+/**
+ * Used to get a vector with the right amount of blocks and length of blocks
+ * @param num
+ * @param size
+ * @param offset
+ * @return
+ */
 vector<int> StringModifier::getVector(int num, int size, int offset){
     vector<int> v;
     for (int i = 0; i < num-1; ++i) {

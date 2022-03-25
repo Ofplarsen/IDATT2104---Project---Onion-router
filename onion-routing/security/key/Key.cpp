@@ -3,7 +3,6 @@
 //
 #include "Key.h"
 #include "../diffie-helman/SC.h"
-#include "../string-modifier/StringModifier.h"
 #define G 134547571
 #define P 217436006305459749
 /**

@@ -10,11 +10,10 @@
 #include "vector"
 #include "../model/Cryption.h"
 /**
- * Class used for modifying strings
+ * Class used for modifying strings and Cryption (custom class)
  */
 class StringModifier {
 public:
-    static unsigned char* convertToCharArray(long long int a);
     static std::vector<std::string> splitString(std::string string, int splitLength);
     static std::string cryptionToString(Cryption &cryption);
 
@@ -23,8 +22,6 @@ public:
     static long long int BN2LLI(BIGNUM *num);
 
     static Cryption splitString(string string);
-
-    static int getLengthOfLastBlock(string text);
 
     static vector<int> getVector(int num, int size, int offset);
 

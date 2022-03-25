@@ -5,15 +5,12 @@
 #include <stdexcept>
 #include <iostream>
 #include "../string-modifier/StringModifier.h"
-bool Handshake::doHandshake(Node n1, Node n2) {
-//    try {
-//        unsigned long long int secretKey1 = n1.getKey.getSecretKey(bobKey.generateKey());
-//        long long int secretKey = secretKey1 / 10000;
-//    }catch (int num){
-//        return false;
-//    }
-}
-
+/**
+ * Method that performs a handshake between two keys (owned by nodes) and generates a secret key between them
+ * @param k1
+ * @param k2
+ * @return
+ */
 BIGNUM * Handshake::doHandshake(Key &k1, Key &k2) {
     BN_CTX *ctx = BN_CTX_new();
     BIGNUM *secretKeyk1 = BN_new();

@@ -32,36 +32,18 @@ public:
     Key encryptKey;
     Key decryptKey;
     string encrypt(string message);
-    string decrypt(string message);
-    string get_public_key();
-    void send_message(string message);
-    void receive_message(string message);
-    void connect();
 
     void initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp);
     SOCKET getConnectSocket(const char *ip, const char *port);
     SOCKET getListenSocket(const char *port_nr);
 
 
-    Cryption encrypt(Cryption message);
-
-    Cryption encryptC(string message);
-
-    Cryption decryptC(Cryption message);
 
     string decrypt(Cryption &message);
 
-    Cryption encryptC(Cryption &c);
-
-    Cryption decryptC(vector<string> msg, vector<int> length);
-
-    Cryption buildCryption(string message, string len);
-
-    string buildString(Cryption &c);
 
     vector<int> split(string s);
 
-    void receiveAndSend();
 
     void printError();
 };

@@ -31,13 +31,13 @@ public:
     explicit ExitNode(const char *listenPort){
         this->listenPort=listenPort;
     }
-    void sendGetRequest(const char *ip, const char *port);
-
     void initialize_server_socket(const char *listenPort);
-    void receiveAndSend();
 
     SOCKET getListenSocket(const char *nr);
     SOCKET getConnectSocket(const char *ip, const char *port);
+
+    vector<string> parseInitialReq(string req);
+    string constructGetReq(string domain_name, string path);
 };
 
 

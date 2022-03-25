@@ -50,7 +50,7 @@ public:
 
     string receiveMessage(Cryption &c);
 
-    vector<int> split(string s);
+    static vector<int> split(string s);
 
 };
 

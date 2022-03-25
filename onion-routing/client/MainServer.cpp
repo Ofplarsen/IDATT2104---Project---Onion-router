@@ -19,32 +19,37 @@ bool MainServer::generateKeys(){
         keys.push_back(num);
     }
     userInputNode.decryptKey.secretKey = userNodes[0].decryptKey.secretKey;
-    userExitNode.encryptKey.secretKey = userNodes[userNodes.size()-1].decryptKey.secretKey;
+    userExitNode.encryptKey.secretKey = userNodes[userNodes.size()-1].encryptKey.secretKey;
     return true;
 }
-
+/**
+ * Method that encrypts message right amount of times
+ * @param text
+ * @return
+ */
 Cryption MainServer::encrypt(string text){
     vector<Cryption> c;
     c.push_back(Crypter::encrypt(text, keys[userNodes.size()-2]));
     int x = 0;
     for(int i = userNodes.size()-3; i >= 0; i--){
-        long long int k = keys[i];
         c.push_back(Crypter::encrypt(c[x], keys[i]));
         x++;
     }
     return c[c.size()-1];
 }
-
+/**
+ * Method that decrypts a Cryption until it is decrypted
+ * @param c
+ * @return
+ */
 string MainServer::decrypt(Cryption &c) {
     Cryption text;
     vector<Cryption> cr;
     vector<string> s;
     cr.push_back(c);
-    int x = 0;
-    for(int i = userNodes.size()-2; i >= 0; i--){
-        text = Crypter::decrypt(cr[x], keys[i]);
+    for(int i = 0; i < userNodes.size()-1; i++){
+        text = Crypter::decrypt(cr[i], keys[i]);
         cr.push_back(text);
-        x++;
     }
     return StringModifier::cryptionToString(cr[userNodes.size()-1]);
 }
@@ -53,7 +58,11 @@ string MainServer::decrypt(Cryption &c) {
 const vector<Node> &MainServer::getUserNodes() const {
     return userNodes;
 }
-
+/**
+ * Method that encrypts a string before being sent into onion
+ * @param message
+ * @return
+ */
 string MainServer::sendMessage(string message){
     Cryption encrypted = encrypt(message);
 
@@ -62,7 +71,11 @@ string MainServer::sendMessage(string message){
     //receiveMessage(encrypted);
     return encryptedString;
 }
-
+/**
+ * Method that decrypts a Cryption after received from onion
+ * @param c
+ * @return
+ */
 string MainServer::receiveMessage(Cryption &c){
     string t = decrypt(c);
     return t;
@@ -165,16 +178,15 @@ int MainServer::start() {
                 string response; //Gathering all response information in a string
                 do {
                     iResult = recv(connectSocket, recvbuf, recvbuflen, 0); //Receiving from nextNode
-
                     //string recBufStr(recvbuf);
                     //cout<<recBufStr<<endl;
                     //if(recBufStr.find("</html>") != string::npos) break; //Found end of html, breaking loop
                     if (iResult > 0) {
                         printf("Bytes received: %d", iResult);
-                        response += string(recvbuf).substr(0, iResult);
+                        response += string(recvbuf, iResult).substr(0, iResult);
                     }
                     else if (iResult == 0)
-                        printf("Connection with next closed\n");
+                        printf("Connection with next closed MAINS\n");
                     else
                         printf("recv failed: %d\n", WSAGetLastError());
                 } while (iResult > 0);
@@ -195,7 +207,7 @@ int MainServer::start() {
                 cre.strings_len = StringModifier::getVector(sizes[0],sizes[1],sizes[2]);
 
                 response = receiveMessage(cre);
-
+                cout << "RESPONSE AND DECRYPTED\n" << response << endl;
                 //Extracting content length from header
                 size_t contLenPos = response.find("Content-Length: "); //Find position of string
                 size_t newLnAfterContLen = response.find("\r\n", contLenPos); //Find first newline after contLenPos
