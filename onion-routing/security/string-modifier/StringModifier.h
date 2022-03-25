@@ -16,7 +16,6 @@ class StringModifier {
 public:
     static unsigned char* convertToCharArray(long long int a);
     static std::vector<std::string> splitString(std::string string, int splitLength);
-    static unsigned char* convertToCharArray(std::string text);
     static std::string cryptionToString(Cryption &cryption);
 
     static string BN2Str(BIGNUM *num);
@@ -28,6 +27,9 @@ public:
     static int getLengthOfLastBlock(string text);
 
     static vector<int> getVector(int num, int size, int offset);
+
+
+    static unsigned char *convertToCharArray(string text);
 };
 
 

@@ -3,7 +3,7 @@
 //
 #include "Key.h"
 #include "../diffie-helman/SC.h"
-
+#include "../string-modifier/StringModifier.h"
 #define G 134547571
 #define P 217436006305459749
 /**
@@ -21,8 +21,7 @@ BIGNUM * Key::generateKey(){
  * @return
  */
 BIGNUM * Key::getSecretKey(BIGNUM *generatedKey){
-        secretKey = SC::power(generatedKey, privateKey, publicKeyP);
-        return secretKey;
+        return SC::power(generatedKey, privateKey, publicKeyP);
     };
 
 

@@ -44,11 +44,13 @@ void Node::initialize_server_socket(const char *listenPort, const char *connectP
 
         string initial_user_req;
         do {
-        iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
-        printf("Bytes received: %d\n", iStart);
-        initial_user_req += string(recvbuf).substr(0, iStart); //Gathering user request in a string
-        //cout << recvbuf << endl;
-        iResult = iStart;
+            iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
+            printf("Bytes received: %d\n", iStart);
+            cout << WSAGetLastError() << endl;
+            cout<< "Received from Main: " <<recvbuf<<endl;
+            //cout << "\nSubstring created: \n" << string(recvbuf).substr(0, iStart) << endl;
+            initial_user_req.append(string(recvbuf, iStart).substr(0, iStart));
+            iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
         //cout << "Received from prev: " << initial_user_req << "\n" << endl;
 
@@ -58,24 +60,38 @@ void Node::initialize_server_socket(const char *listenPort, const char *connectP
             printf("Bytes received: %d\n", iResult);
 
             SOCKET web_page_socket = getConnectSocket(connectIp, connectPort);
-
+            cout << "\nAs whole string: \n" << initial_user_req << endl;
+            iResult = iStart;
+            //cout << initial_user_req << endl;
+            //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
+//        vector<string> parsed = parse_initial_request(initial_user_req); //Contains domain_name and path
+//
+//        //constructing a get request that the node will send to socket on internet
+//        string getReq = construct_get_request(parsed.at(0), parsed.at(1));
             end = initial_user_req.find("\r\n");
             if(end != string::npos){
                 info = initial_user_req.substr(0, end);
                 initial_user_req = initial_user_req.substr(end+2, initial_user_req.length());
             }
+            cout<< "\nWithout Header: \n" << initial_user_req << endl;
             vector<int> sizes = split(info);
+            cout << sizes[0] << endl;
+            cout << sizes[1] << endl;
+            cout << sizes[2] << endl;
             initial_user_req = initial_user_req.substr(0, sizes[0]*sizes[1]+sizes[2]); //TODO MEM?
 
-
+            cout<< initial_user_req<< endl;
             Cryption cre = StringModifier::splitString(initial_user_req);
-
+            cout << "cre succ" << endl;
             cre.strings_len = StringModifier::getVector(sizes[0],sizes[1],sizes[2]);
+            cout << cre.strings_len.size() << endl;
+            cout << cre.res.size()<< endl;
 
+            cout << "string len suc" << endl;
             string decrypted = decrypt(cre);
-            string returnVal;
-            returnVal = info += decrypted;
-
+            cout<<decrypted<<endl;
+            string returnVal = info+"\r\n" += decrypted;
+            cout << returnVal << endl;
             iSendResult = send(web_page_socket, returnVal.c_str(), returnVal.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("HAPPENED IN NODE PLACE 1");
@@ -469,8 +485,8 @@ Cryption Node::buildCryption(string message, string len){
 }
 
 string Node::encrypt(string message) {
-    cout << StringModifier::BN2LLI(decryptKey.secretKey) << endl;
-    Cryption enc = Crypter::encrypt(message,StringModifier::BN2LLI(decryptKey.secretKey));
+    cout << decryptKey.secretKey << endl;
+    Cryption enc = Crypter::encrypt(message,decryptKey.secretKey);
     string encrypted;
     for(int i = 0; i < enc.getRes().size(); i++){
         for(int y = 0; y < enc.strings_len[i]; y++){
@@ -481,15 +497,15 @@ string Node::encrypt(string message) {
 }
 
 Cryption Node::encryptC(string message) {
-    return Crypter::encrypt(message,StringModifier::BN2LLI(decryptKey.secretKey));
+    return Crypter::encrypt(message,decryptKey.secretKey);
 }
 
 Cryption Node::encryptC(Cryption &c) {
-    return Crypter::encrypt(c,StringModifier::BN2LLI(decryptKey.secretKey));
+    return Crypter::encrypt(c,decryptKey.secretKey);
 }
 
 string Node::decrypt(Cryption &message) {
-    long long int key = StringModifier::BN2LLI(encryptKey.secretKey);
+    long long int key = decryptKey.secretKey;
     cout << key << endl;
     Cryption dec = Crypter::decrypt(message, key);
     string decrypted;
@@ -502,7 +518,7 @@ string Node::decrypt(Cryption &message) {
 }
 
 Cryption Node::decryptC(vector<string> msg, vector<int> length) {
-    return Crypter::decrypt(message,length, StringModifier::BN2LLI(encryptKey.secretKey));
+    return Crypter::decrypt(message,length, encryptKey.secretKey);
 }
 
 vector<int> Node::split(string s){

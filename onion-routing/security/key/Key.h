@@ -20,7 +20,7 @@ private:
     BIGNUM *generatedKey;
 
 public:
-    BIGNUM *secretKey;
+    long long secretKey;
     Key();
 
     BIGNUM * generateKey();

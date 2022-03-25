@@ -18,17 +18,21 @@ bool MainServer::generateKeys(){
         long long int num = StringModifier::BN2LLI(Handshake::doHandshake(it->decryptKey, std::next(it)->encryptKey));
         keys.push_back(num);
     }
-
+    userInputNode.decryptKey.secretKey = userNodes[0].decryptKey.secretKey;
+    userExitNode.encryptKey.secretKey = userNodes[userNodes.size()-1].decryptKey.secretKey;
+    return true;
 }
 
 Cryption MainServer::encrypt(string text){
     vector<Cryption> c;
-    c.push_back(Crypter::encrypt(text, keys[0]));
-    for(int i = 1; i < userNodes.size()-1; i++){
-        c.push_back(Crypter::encrypt(c[i-1], keys[i]));
+    c.push_back(Crypter::encrypt(text, keys[userNodes.size()-2]));
+    int x = 0;
+    for(int i = userNodes.size()-3; i >= 0; i--){
+        long long int k = keys[i];
+        c.push_back(Crypter::encrypt(c[x], keys[i]));
+        x++;
     }
-
-    return c[userNodes.size()-2];
+    return c[c.size()-1];
 }
 
 string MainServer::decrypt(Cryption &c) {
@@ -142,12 +146,12 @@ int MainServer::start() {
                 SOCKET connectSocket = SocketGetters::getConnectSocket("192.168.10.100", "8081");
 
                 userRequest = sendMessage(userRequest);
-
+                cout << "Sent from mainServer: " << userRequest << endl;
                 vector<string> parsed = InputNode::parse_initial_request(userRequest); //Contains domain_name and path
 
                 //constructing a get request that the node will send to socket on internet
                 string getReq = InputNode::construct_get_request(parsed.at(0), parsed.at(1));
-
+                cout<< "Length of user request" << userRequest.length() << endl;
                 iSendResult = send(connectSocket, userRequest.c_str(), userRequest.length(), 0);
                 if (iSendResult == SOCKET_ERROR) {
                     printf("HAPPENED IN MAINSERVER PLACE 1");
@@ -337,13 +341,13 @@ string MainServer::notFound(){
 }
 
 void MainServer::initNodes(){
-    userNodes.push_back(InputNode("8081", "8087", "192.168.10.100"));
-
+    userInputNode = InputNode("8081", "8087", "192.168.10.100");
+    userNodes.push_back(userInputNode);
     for(int i = 0; i < nodeAmount-2; i++){
         userNodes.push_back(Node("8087", "8080", "192.168.10.100"));
     }
-    ExitNode exn1("8080", "0" ,"0");
-    userNodes.push_back(exn1);
+    userExitNode =  ExitNode("8080", "0" ,"0");
+    userNodes.push_back(userExitNode);
 }
 
 vector<int> MainServer::split(string s){

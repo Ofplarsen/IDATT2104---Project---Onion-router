@@ -44,18 +44,39 @@ Cryption StringModifier::splitString(std::string string) {
     int length = string.length();
     int intervals = length/32;
 
-
     for (auto i = 0; i < intervals; i++)
     {
-        c.res.push_back(convertToCharArray(string.substr(i * 32, 32)));
+        unsigned char decrypted[32];
+        memset(decrypted, 0, 32);
+
+        const std::string text = (string.substr(i * 32, 32));
+
+        for (int j = 0; j < 32; ++j) {
+            decrypted[j] = text.c_str()[j];
+        }
+
+        char * copy = static_cast<char *>(malloc(32));
+        strcpy(copy, reinterpret_cast<const char *>(decrypted));
+
         c.strings_len.push_back(32);
+        c.res.emplace_back(reinterpret_cast<unsigned char *const>(copy));
     }
 
     if (string.length() % 32 != 0)
     {
         int l = string.substr(32 * intervals).length();
-        c.res.push_back(convertToCharArray(string.substr(32 * intervals)));
+        std::string text = (string.substr(intervals * 32, l));
+        unsigned char decrypted[l];
+        memset(decrypted, 0, l);
+        for (int j = 0; j < l; ++j) {
+            decrypted[j] = text.c_str()[j];
+        }
+
+        char * copy = static_cast<char *>(malloc(l));
+        strcpy(copy, reinterpret_cast<const char *>(decrypted));
+
         c.strings_len.push_back(l);
+        c.res.emplace_back(reinterpret_cast<unsigned char *const>(copy));
     }
 
     return c;
@@ -78,14 +99,13 @@ std::string StringModifier::cryptionToString(Cryption &cryption) {
 }
 
 long long int StringModifier::BN2LLI(BIGNUM *num){
-    BIGNUM *dupNum;
-    dupNum = BN_dup(num);
+    BIGNUM *dupNum = BN_new();
+    BN_copy(dupNum,num);
 
     char* charNum;
 
     charNum = BN_bn2dec(dupNum);
     string strNum = string(charNum);
-    BN_free(dupNum);
     return stoll(strNum, nullptr, 10);
 }
 
@@ -113,7 +133,7 @@ int StringModifier::getLengthOfLastBlock(string text){
 
 vector<int> StringModifier::getVector(int num, int size, int offset){
     vector<int> v;
-    for (int i = 0; i < num; ++i) {
+    for (int i = 0; i < num-1; ++i) {
         v.push_back(size);
     }
     v.push_back(offset);

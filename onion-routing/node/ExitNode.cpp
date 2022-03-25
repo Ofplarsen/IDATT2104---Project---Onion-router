@@ -171,25 +171,46 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
         string info;
         string initial_user_req;
         do {
-            iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
+            iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
             printf("Bytes received: %d\n", iStart);
-            initial_user_req += string(recvbuf).substr(0, iStart); //Gathering user request in a string
-            cout << recvbuf << endl << endl;
+            cout << WSAGetLastError() << endl;
+            cout<< "Received from Main: " <<recvbuf<<endl;
+            //cout << "\nSubstring created: \n" << string(recvbuf).substr(0, iStart) << endl;
+            initial_user_req.append(string(recvbuf, iStart).substr(0, iStart));
             iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
-        cout << "Received from prev: " << initial_user_req << "\n" << endl;
-
+        cout << "\nAs whole string: \n" << initial_user_req << endl;
+        iResult = iStart;
+        //cout << initial_user_req << endl;
+        //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
+//        vector<string> parsed = parse_initial_request(initial_user_req); //Contains domain_name and path
+//
+//        //constructing a get request that the node will send to socket on internet
+//        string getReq = construct_get_request(parsed.at(0), parsed.at(1));
+        end = initial_user_req.find("\r\n");
+        if(end != string::npos){
+            info = initial_user_req.substr(0, end);
+            initial_user_req = initial_user_req.substr(end+2, initial_user_req.length());
+        }
+        cout<< "\nWithout Header: \n" << initial_user_req << endl;
         vector<int> sizes = split(info);
+        cout << sizes[0] << endl;
+        cout << sizes[1] << endl;
+        cout << sizes[2] << endl;
         initial_user_req = initial_user_req.substr(0, sizes[0]*sizes[1]+sizes[2]); //TODO MEM?
 
+//        cout<< initial_user_req<< endl;
+//        Cryption cre = StringModifier::splitString(initial_user_req);
+//        cout << "cre succ" << endl;
+//        cre.strings_len = StringModifier::getVector(sizes[0],sizes[1],sizes[2]);
+//        cout << cre.strings_len.size() << endl;
+//        cout << cre.res.size()<< endl;
 
-        Cryption cre = StringModifier::splitString(initial_user_req);
-
-        cre.strings_len = StringModifier::getVector(sizes[0],sizes[1],sizes[2]);
-
-        string decrypted = decrypt(cre);
-
-        initial_user_req = info += decrypted;
+//        cout << "string len suc" << endl;
+//        string decrypted = decrypt(cre);
+//        cout<<decrypted<<endl;
+//        string returnVal = info+"\r\n" += decrypted;
+//        cout << returnVal << endl;
 
         //Extracting domain name and path in user request. Test webpage input www.softwareqatest.com/qatfaq2.html
         int spaces_until_sep;
@@ -342,26 +363,47 @@ void ExitNode::receiveAndSend() {
         string info;
         string initial_user_req;
         do {
-            iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
+            iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
             printf("Bytes received: %d\n", iStart);
-            initial_user_req += string(recvbuf).substr(0, iStart); //Gathering user request in a string
-            cout << recvbuf << endl << endl;
+            cout << WSAGetLastError() << endl;
+            cout<< "Received from last Node: " <<recvbuf<<endl;
+            //cout << "\nSubstring created: \n" << string(recvbuf).substr(0, iStart) << endl;
+            initial_user_req.append(string(recvbuf, iStart).substr(0, iStart));
             iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
         cout << "Received from prev: " << initial_user_req << "\n" << endl;
-
+        iResult = iStart;
+        //cout << initial_user_req << endl;
+        //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
+//        vector<string> parsed = parse_initial_request(initial_user_req); //Contains domain_name and path
+//
+//        //constructing a get request that the node will send to socket on internet
+//        string getReq = construct_get_request(parsed.at(0), parsed.at(1));
+        end = initial_user_req.find("\r\n");
+        if(end != string::npos){
+            info = initial_user_req.substr(0, end);
+            initial_user_req = initial_user_req.substr(end+2, initial_user_req.length());
+        }
+        cout<< "\nWithout Header: \n" << initial_user_req << endl;
         vector<int> sizes = split(info);
+        cout << sizes[0] << endl;
+        cout << sizes[1] << endl;
+        cout << sizes[2] << endl;
         initial_user_req = initial_user_req.substr(0, sizes[0]*sizes[1]+sizes[2]); //TODO MEM?
 
-
+        cout<< initial_user_req<< endl;
         Cryption cre = StringModifier::splitString(initial_user_req);
-
+        cout << "cre succ" << endl;
         cre.strings_len = StringModifier::getVector(sizes[0],sizes[1],sizes[2]);
+        cout << cre.strings_len.size() << endl;
+        cout << cre.res.size()<< endl;
 
+        cout << "string len suc" << endl;
         string decrypted = decrypt(cre);
-
-        initial_user_req = info += decrypted;
-        cout << "Initial User req: " << initial_user_req << endl;
+        cout<<decrypted<<endl;
+        string returnVal = info+"\r\n" += decrypted;
+        cout << returnVal << endl;
+        initial_user_req = returnVal;
         //Extracting domain name and path in user request. Test webpage input www.softwareqatest.com/qatfaq2.html
         int spaces_until_sep;
         int first_ln_len = 0;

@@ -36,15 +36,18 @@ void InputNode::initialize_server_socket(const char *listenPort, const char *con
     do {
         size_t end;
         string info;
-        string initial_user_req;
         do {
             iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //initial request from prev/client
             printf("Bytes received: %d\n", iStart);
-            initial_user_req += string(recvbuf).substr(0, iStart);
-            cout<<recvbuf<<endl;
+            cout << WSAGetLastError() << endl;
+            cout<< "Received from Main: " <<recvbuf<<endl;
+            //cout << "\nSubstring created: \n" << string(recvbuf).substr(0, iStart) << endl;
+            initial_user_req.append(string(recvbuf, iStart).substr(0, iStart));
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
+
+        cout << "\nAs whole string: \n" << initial_user_req << endl;
         iResult = iStart;
-        cout << initial_user_req << endl;
+        //cout << initial_user_req << endl;
         //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
 //        vector<string> parsed = parse_initial_request(initial_user_req); //Contains domain_name and path
 //
@@ -55,7 +58,7 @@ void InputNode::initialize_server_socket(const char *listenPort, const char *con
             info = initial_user_req.substr(0, end);
             initial_user_req = initial_user_req.substr(end+2, initial_user_req.length());
         }
-        cout << initial_user_req << endl;
+        cout<< "\nWithout Header: \n" << initial_user_req << endl;
         vector<int> sizes = split(info);
         cout << sizes[0] << endl;
         cout << sizes[1] << endl;
@@ -72,12 +75,13 @@ void InputNode::initialize_server_socket(const char *listenPort, const char *con
         cout << "string len suc" << endl;
         string decrypted = decrypt(cre);
         cout<<decrypted<<endl;
-        initial_user_req = info += decrypted;
-        cout<<initial_user_req<<endl;
+        string returnVal = info+"\r\n" += decrypted;
+        cout<<returnVal<<endl;
         if (iResult > 0) {
             SOCKET web_page_socket = getConnectSocket(connectIp, connectPort); //TODO fix here to change which connection to forward to
             cout << "connected to next, trying to send" << endl;
-            iSendResult = send(web_page_socket, initial_user_req.c_str(), initial_user_req.length(), 0); //forwarding received message to next/server
+            cout << "Length of returnVal" << returnVal.length() << endl;
+            iSendResult = send(web_page_socket, returnVal.c_str(), returnVal.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("HAPPENED IN INPUTNODE PLACE 1");
                 printf("send failed: %d\n", WSAGetLastError());

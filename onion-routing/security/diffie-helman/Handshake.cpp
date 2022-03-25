@@ -48,6 +48,8 @@ BIGNUM * Handshake::doHandshake(Key &k1, Key &k2) {
         BN_free(ten);
         BN_free(rem);
     }
+    k1.secretKey = StringModifier::BN2LLI(secretKeyk1);
+    k2.secretKey = StringModifier::BN2LLI(secretKeyk2);
     cout << ("6*7=%s\n", BN_bn2dec(secretKeyk1)) << endl;
     cout << ("6*7=%s\n", BN_bn2dec(secretKeyk2)) << endl;
     BN_CTX_free(ctx);
