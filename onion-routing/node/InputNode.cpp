@@ -11,7 +11,6 @@
 /**
  * Initializes an InputNode that can take a get request sent by a browser, use its contents to construct another get
  * request that is then sent to the next Node.
- *
  * @param listenPort port used to listen for connections
  * @param connectPort  port used to connect to next Node
  * @param connectIp IP used to connect to next Node
@@ -133,7 +132,6 @@ void InputNode::initialize_server_socket(const char *listenPort, const char *con
 
 /**
  * Parses get request sent from browser to InputNode and extracts domain name and path, which is put in a vector.
- *
  * @param req get request from browser
  * @return a vector containing the domain name at index 0 and path at index 1
  */
@@ -157,7 +155,6 @@ vector<string> InputNode::parse_initial_request(string req) {
 
 /**
  * Constructs a basic get request given a domain name and path.
- *
  * @param domain_name name of the website that the get request should be sent to
  * @param path path for request, if any
  * @return a string containing a get request for some URL

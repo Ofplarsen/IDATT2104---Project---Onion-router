@@ -11,7 +11,6 @@
 //Websites for testing: www.example.com, www.softwareqatest.com, www.columbia.edu/~fdc/sample.html (something goes wrong here), www.virtu-software.com (something goes wrong here)
 /**
  * Starts the application letting the user connect to a socket on port 777
- *
  * @return 0 if exited cleanly, 1 if not
  */
 int MainServer::start() {
@@ -189,7 +188,7 @@ int MainServer::start() {
  * @param req request from browser
  * @return a string containing the user command
  */
-string MainServer::parseGetReq(string req){ //TODO make req const -Clang(?)
+string MainServer::parseGetReq(string req){
     string firstLineEnd = " HTTP/1.1\r\n";
     int firstLineEndPos = req.find(firstLineEnd);
     if(firstLineEndPos == -1) return "INVALID";
@@ -200,7 +199,6 @@ string MainServer::parseGetReq(string req){ //TODO make req const -Clang(?)
 /**
  * deprecated
  * Lets user choose a number in a range for how many Nodes they want to use.
- *
  * @param min minimum amount of Nodes
  * @param max maximum amount of Nodes
  * @return amount of Nodes the user wants
@@ -218,7 +216,6 @@ int MainServer::getNodeAmount(int min, int max){
 
 /**
  * HTTP response greeting the user.
- *
  * @return a string containing the HTTP greeting
  */
 string MainServer::welcome(){

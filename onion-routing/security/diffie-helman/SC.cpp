@@ -1,13 +1,6 @@
-
 #include <cmath>
-#include <ctime>
 #include <bits/stdc++.h>
 #include "SC.h"
-
-#include <stdio.h>
-#include <openssl/dh.h>
-#include <openssl/bn.h>
-
 
 using namespace std;
 /**
@@ -56,18 +49,3 @@ BIGNUM * SC::getRandomPrime(){
 BIGNUM * SC::generatePrivateKey(){
     return getRandomPrime();
 };
-
-//TODO REMOVE THESE IF no use
-unsigned long long int SC::powerG(int x, unsigned int y, int p){
-    int res = 1;
-
-    x = x % p;
-    while(y > 0){
-        if(y & 1)
-            res = (res * x) % p;
-        y = y >> 1;
-        x = (x*x) % p;
-    }
-    return res;
-}
-

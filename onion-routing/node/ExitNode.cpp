@@ -9,7 +9,6 @@
  * Initializes an ExitNode which listens on a given port. The data received from previous Nodes is used to figure out
  * which website ExitNode should redirect the data to, and sends it to the given HTTP website. The response is then sent
  * bak to the previous Nodes.
- *
  * @param listenPort port used to listen for connections
  */
 void ExitNode::initialize_server_socket(const char *listenPort) {

@@ -3,23 +3,20 @@
 //
 #include <cmath>
 #include <openssl/evp.h>
-#include <openssl/bio.h>
-#include <cstring>
 #include <utility>
 #include <openssl/err.h>
 #include <iostream>
 #include "../string-modifier/StringModifier.h"
 #include "Crypter.h"
-#include "../model/Cryption.h"
-#include <openssl/ssl.h>
-#include <openssl/err.h>
 #include <string.h>
-#include <iostream>
+
 #define BLOCK_SIZE 32
 
 using namespace std;
 
-
+/**
+ * Method that decrypts a bock of chars with given key
+ */
 int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, unsigned char* text){
     int text_len = 0;
     int len = 0;
@@ -66,6 +63,14 @@ int Crypter::decrypt(unsigned char* cipher, int cipher_len, unsigned char* key, 
     return text_len;
 }
 
+/**
+ * Method that encrypts a block of chars with given key
+ * @param text
+ * @param text_len
+ * @param key
+ * @param cipher
+ * @return
+ */
 int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsigned char* cipher){
     int cipher_len = 0;
     int len = 0;
@@ -104,9 +109,14 @@ int Crypter::encrypt(unsigned char* text, int text_len, unsigned char* key, unsi
     return cipher_len;
 }
 
+/**
+* Method that encrypts a vector of strings with given key in a char array
+* @param strings
+* @param key
+* @return
+*/
 Cryption Crypter::encryptString(vector<string> strings, long long int key) {
 
-    //std::vector<std::string> strings = StringModifier::splitString(text, 32);
     vector<unsigned char*> returnValue;
     std::vector<int> returnLengths;
     Cryption c;
@@ -117,7 +127,6 @@ Cryption Crypter::encryptString(vector<string> strings, long long int key) {
 
         unsigned char encrypted[64];
         memset(encrypted, 0, 64);
-        //std::string keyd = std::to_string(key);
         unsigned long t = strlen((const char*)(temp));
 
         int encrypted_len = encrypt(temp, t, StringModifier::convertToCharArray(std::to_string(key)), encrypted);
@@ -132,9 +141,14 @@ Cryption Crypter::encryptString(vector<string> strings, long long int key) {
     return c;
 }
 
+/**
+ * Method that encrypts a Cryption with given key
+ * @param c
+ * @param key
+ * @return
+ */
 Cryption Crypter::encryptString(Cryption &c, long long int key) {
 
-    //std::vector<std::string> strings = StringModifier::splitString(text, 32);
     vector<unsigned char*> returnValue;
     std::vector<int> returnLengths;
     Cryption cr;
@@ -158,9 +172,14 @@ Cryption Crypter::encryptString(Cryption &c, long long int key) {
     return cr;
 }
 
+/**
+ * Method that encrypts a vector of strings with given key in a char array
+ * @param strings
+ * @param key
+ * @return
+ */
 Cryption Crypter::encryptString(vector<string> strings, unsigned char* key) {
 
-    //std::vector<std::string> strings = StringModifier::splitString(text, 32);
     vector<unsigned char*> returnValue;
     std::vector<int> returnLengths;
     Cryption c;
@@ -180,15 +199,15 @@ Cryption Crypter::encryptString(vector<string> strings, unsigned char* key) {
         c.res.push_back(reinterpret_cast<unsigned char *const>(copy));
     }
 
-//    for(int i = 0; i < returnValue.size(); i++){
-//        for(int y = 0; y < returnLengths[i]; y++){
-//            printf("%02x ", returnValue[i][y]);
-//        }
-//    }
-
     return c;
 }
 
+/**
+ * Method that decrypts a Cryption with given key (charArray)
+ * @param cryption
+ * @param key
+ * @return
+ */
 Cryption Crypter::decryptString(Cryption& cryption, unsigned char* key) {
 
     std::vector<unsigned char*> returnValue;
@@ -215,6 +234,12 @@ Cryption Crypter::decryptString(Cryption& cryption, unsigned char* key) {
     return c;
 }
 
+/**
+ * Method that decrypts a Cryption with given key (long long int)
+ * @param cryption
+ * @param key
+ * @return
+ */
 Cryption Crypter::decryptString(Cryption& cryption, long long int key) {
 
     std::vector<unsigned char*> returnValue;
@@ -241,6 +266,13 @@ Cryption Crypter::decryptString(Cryption& cryption, long long int key) {
     return c;
 }
 
+/**
+ * Method that decrypts a vector of strings with block sizes (and offset) with given key
+ * @param strings
+ * @param lengths
+ * @param key
+ * @return
+ */
 Cryption Crypter::decryptString(vector<string> strings,vector<int> lengths, long long int key) {
 
     std::vector<unsigned char*> returnValue;
@@ -267,6 +299,12 @@ Cryption Crypter::decryptString(vector<string> strings,vector<int> lengths, long
     return c;
 }
 
+/**
+ * Method that encrypts a string with given key
+ * @param stringToEncrypt
+ * @param key
+ * @return
+ */
 Cryption Crypter::encrypt(string stringToEncrypt, long long int key) {
     vector<string> stringToEncryptSplit = StringModifier::splitString(std::move(stringToEncrypt), BLOCK_SIZE);
     Cryption enc = Crypter::encryptString(stringToEncryptSplit, key);
@@ -274,21 +312,46 @@ Cryption Crypter::encrypt(string stringToEncrypt, long long int key) {
     return enc;
 }
 
+/**
+ * Method that encrypts a Cryption with given key
+ * @param c
+ * @param key
+ * @return
+ */
 Cryption Crypter::encrypt(Cryption &c, long long int key) {
     Cryption enc = Crypter::encryptString(c, key);
     return enc;
 }
 
+/**
+ * Method that decrypts vector of stirngs with block size and returns Cryption
+ * @param stringToDecrypt
+ * @param lengths
+ * @param key
+ * @return
+ */
 Cryption Crypter::decrypt(string stringToDecrypt,vector<int> lengths, long long int key) {
     vector<string> str = StringModifier::splitString(std::move(stringToDecrypt), BLOCK_SIZE);
 
     return decryptString(str, std::move(lengths),key);
 }
 
+/**
+ * Decrypts a Cryption with given key
+ * @param cryption
+ * @param key
+ * @return
+ */
 Cryption Crypter::decrypt(Cryption &cryption, long long int key) {
     return decryptString(cryption, key);
 }
 
+/**
+ * Encrypts a string with key as char array
+ * @param stringToEncrypt
+ * @param key
+ * @return
+ */
 Cryption Crypter::encrypt(string stringToEncrypt, unsigned char* key) {
     vector<string> stringToEncryptSplit = StringModifier::splitString(std::move(stringToEncrypt), BLOCK_SIZE);
     Cryption enc = Crypter::encryptString(stringToEncryptSplit, key);
@@ -296,14 +359,12 @@ Cryption Crypter::encrypt(string stringToEncrypt, unsigned char* key) {
     return enc;
 }
 
+/**
+ * Decrypts a Cryption with key as char array
+ * @param cryption
+ * @param key
+ * @return
+ */
 Cryption Crypter::decrypt(Cryption &cryption, unsigned char* key) {
     return decryptString(cryption, key);
-}
-
-unsigned long long int encryptDiff(char c, long long int key){
-    return key+c;
-}
-
-int decryptDiff(long long int crypted, long long int key){
-    crypted-key;
 }

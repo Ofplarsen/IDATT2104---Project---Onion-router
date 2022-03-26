@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <unordered_set>
-
 #include <stdio.h>
 #include <openssl/dh.h>
 #include <openssl/bn.h>

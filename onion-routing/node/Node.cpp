@@ -8,7 +8,12 @@
 #include <regex>
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
-
+/**
+ * Initializes a Node that receives and sends data to the Nodes that this one is connected.
+ * @param listenPort port which the Node listens for connections on
+ * @param connectPort port used to connect to next Node
+ * @param connectIp IP used to connect to next Node
+ */
 void Node::initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp) {
 
     SOCKET ListenSocket = SocketGetters::getListenSocket(listenPort); //Making a socket listen on given port
