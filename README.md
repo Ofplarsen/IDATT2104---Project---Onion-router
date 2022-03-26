@@ -97,6 +97,7 @@ We used these classes from OpenSSL:
     - Encryption and decryption is quite unstable, with different words / 
       places in the string that gets corrupted each time (might have something to do with keygen)
     - The nodes are not being selected from a node pool
+    - Not great memory management. Should be imporved
 
 
 
