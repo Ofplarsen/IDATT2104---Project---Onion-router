@@ -97,7 +97,7 @@ The project proved to be quite challenging, and as a result not everything is as
 
 
 
-#Task Description (NO)
+<h1>Task Description (NO)</h1>
 Prosjektoppgaven er frivillig og kan kun utføres av studenter som får C i mappevurderingen i programmeringsdelen av emnet. Prosjektet gjennomføres av studenter som vil forbedre karakteren i programmeringsdelen til A eller B. Karakteren i programmeringsdelen teller 50% av totalkarakteren i emnet. Totalkarakteren vil alltid settes til gunst for studenten. En B i datakommunikasjonsdelen sammen med en C i programmeringsdelen vil altså gi totalkarakteren B.
 Merk at alle deler av prosjektet (programmert løsning, dokumentasjon og presentasjon) forventes å holde meget god kvalitet for å oppnå karakteren B eller A.
 Maks antall studenter i en gruppe: 3
