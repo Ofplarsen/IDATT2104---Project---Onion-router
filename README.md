@@ -41,8 +41,8 @@ the data should be decrypted.
 The encryption/decryption is not reliable, so be prepared to run the program a couple of times to ensure that
 you get the functionality described.
 
-When testing this branch please visit http://localhost:777/www.softwareqatest.com/. This site should show the user
-how the encryption/decryption works when reading the console.
+When testing this branch please visit http://localhost:777/www.softwareqatest.com. This site should show the user
+how the encryption/decryption works when reading the console. Do not include '/' at the end 
 
 <h2>Functionality:</h2>
 <h3>Master Branch</h3>
