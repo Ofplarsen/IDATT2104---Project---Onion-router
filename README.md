@@ -25,7 +25,7 @@ Run the program and visit localhost:777/ for instructions.
 
 <h3>Master branch</h3>
 The master branch contains the program where the routing works. There is no encryption/decryption, but the get-request from the
-client is sent through different nodes.
+client is sent through different nodes. A good testsite is http://localhost:777/www.softwareqatest.com/
 
 <h3>Node-with-enc</h3>
 This branch contains the onion router. Sending the get-request from the client to the exit-node is usually
@@ -40,7 +40,7 @@ the data should be decrypted.
 The encryption/decryption is not reliable, so be prepared to run the program a couple of times to ensure that
 you get the functionality described.
 
-When testing this branch please visit http://localhost:777/www.softwareqatest.com. This site should show the user
+When testing this branch please visit http://localhost:777/www.softwareqatest.com/. This site should show the user
 how the encryption/decryption works when reading the console.
 
 <h2>Functionality:</h2>
