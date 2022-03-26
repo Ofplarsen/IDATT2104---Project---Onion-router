@@ -42,7 +42,9 @@ The encryption/decryption is not reliable, so be prepared to run the program a c
 you get the functionality described.
 
 When testing this branch please visit http://localhost:777/www.softwareqatest.com/. This site should show the user
-how the encryption/decryption works when reading the console.
+how the encryption/decryption works when reading the console. Also note that the browsers cache can mess with the functionality
+of the program. Firefox is recommended as browser, since you can disable cache under Developer Tools > Network > Disable cache (almost all the way 
+in the top right corner).
 
 <h2>Functionality:</h2>
 <h3>Master Branch</h3>
