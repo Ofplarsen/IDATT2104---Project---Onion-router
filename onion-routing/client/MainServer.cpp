@@ -17,7 +17,7 @@ int MainServer::start() {
     //Getting localhosts IP from user
     const char* localhost = getLocalhostIpFromUser().c_str(); //"192.168.56.1";
     //inform user about what to do next (log on with browser)
-    cout << "Please go to your preferred browser and enter 'localhost:777' to begin using the program." << endl;
+    cout << endl << "Please go to your preferred browser and enter 'localhost:777' to begin using the program." << endl;
     //initiate server socket and forward socket
     SOCKET mainServer = SocketGetters::getListenSocket("777");
     SOCKET clientConnection = INVALID_SOCKET;
