@@ -10,6 +10,7 @@ bool Handshake::doHandshake(Node n1, Node n2) {
 //    }catch (int num){
 //        return false;
 //    }
+return false;
 }
 
 void Handshake::doHandshake(Key &k1, Key &k2) {

@@ -24,15 +24,17 @@ private:
     vector <Node> userNodes;
     vector <Key> keys;
 public:
-
-    void generateKeys();
     int start();
     string parseGetReq(string req);
     int getNodeAmount(int min, int max);
     string welcome();
     string help();
 
-    string notFound();
+    string notFound(string command);
+
+    void traverseNodes(string userRequest, const char* localhost, SOCKET clientConnection, char* recvbuf, int recvbuflen);
+
+    string getLocalhostIpFromUser();
 };
 
 

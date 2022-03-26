@@ -12,8 +12,6 @@
 #include <winsock.h>
 
 using namespace std;
-
-
 class InputNode: public Node{
 public:
     void initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp);

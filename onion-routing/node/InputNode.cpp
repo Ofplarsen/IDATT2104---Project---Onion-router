@@ -8,6 +8,14 @@
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
+/**
+ * Initializes an InputNode that can take a get request sent by a browser, use its contents to construct another get
+ * request that is then sent to the next Node.
+ *
+ * @param listenPort port used to listen for connections
+ * @param connectPort  port used to connect to next Node
+ * @param connectIp IP used to connect to next Node
+ */
 void InputNode::initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp) {
 
     SOCKET ListenSocket = SocketGetters::getListenSocket(listenPort); //Making a socket listen on given port
@@ -69,6 +77,7 @@ void InputNode::initialize_server_socket(const char *listenPort, const char *con
                 return;
             }
 
+            //Redirecting response directly
             do {
                 iResult = recv(web_page_socket, recvbuf, recvbuflen, 0); //Receiving from nextNode
                 iSendResult = send(ClientSocket, recvbuf, recvbuflen, 0); //Sending back to prevNode immediately
@@ -121,6 +130,12 @@ void InputNode::initialize_server_socket(const char *listenPort, const char *con
     WSACleanup();
 }
 
+/**
+ * Parses get request sent from browser to InputNode and extracts domain name and path, which is put in a vector.
+ *
+ * @param req get request from browser
+ * @return a vector containing the domain name at index 0 and path at index 1
+ */
 vector<string> InputNode::parse_initial_request(string req) {
     int user_arg_end;
     bool contains_path = false;
@@ -139,6 +154,13 @@ vector<string> InputNode::parse_initial_request(string req) {
     return domain_and_path;
 }
 
+/**
+ * Constructs a basic get request given a domain name and path.
+ *
+ * @param domain_name name of the website that the get request should be sent to
+ * @param path path for request, if any
+ * @return a string containing a get request for some URL
+ */
 string InputNode::construct_get_request(string domain_name, string path) { //Constructs a modified GET request where the first line is the length of the domain and path separated by |
     string get_req = to_string(domain_name.length())+ "|" + to_string(path.length()) + "\r\n" +
             "GET /" + path + " HTTP/1.1\r\nHost: " + domain_name +

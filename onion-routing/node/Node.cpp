@@ -10,6 +10,13 @@
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
+/**
+ * Initializes a Node that can be used to redirect data from one Node to another.
+ *
+ * @param listenPort port used to listen for connections
+ * @param connectPort  port used to connect to next Node
+ * @param connectIp IP used to connect to next Node
+ */
 void Node::initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp) {
 
     SOCKET ListenSocket = SocketGetters::getListenSocket(listenPort); //Making a socket listen on given port
@@ -70,6 +77,7 @@ void Node::initialize_server_socket(const char *listenPort, const char *connectP
                 return;
             }
 
+            //Redirecting response directly
             do {
                 iResult = recv(web_page_socket, recvbuf, recvbuflen, 0); //Receiving from nextNode
                 iSendResult = send(ClientSocket, recvbuf, recvbuflen, 0); //Sending back to prevNode immediately

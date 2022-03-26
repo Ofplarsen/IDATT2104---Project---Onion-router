@@ -12,16 +12,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ws2tcpip.h>
-
-
 #include "Node.h"
 #include <vector>
 
 
 class ExitNode : public Node{
-private:
-    int iResult;
-
 public:
     void sendGetRequest(const char *ip, const char *port);
     void initialize_server_socket(const char *listenPort);

@@ -15,11 +15,10 @@ using namespace std;
 
 class Node {
 private:
-
     Key private_key;
     Key public_key;
     string message;
-
+protected:
     const char *listenPort;
     const char *connectPort;
     const char *connectIp;
@@ -34,6 +33,7 @@ public:
     void connect();
 
     void initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp);
+
 };
 
 
