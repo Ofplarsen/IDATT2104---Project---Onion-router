@@ -85,7 +85,8 @@ string MainServer::receiveMessage(Cryption &c){
 
 int MainServer::start() {
     //create nodePool with x Nodes and give them their
-    nodeAmount = getNodeAmount(3, 12);
+    //nodeAmount = getNodeAmount(3, 12);
+    nodeAmount = 3;
     initNodes();
     //ask for nodeAmount, at least 3
     generateKeys();

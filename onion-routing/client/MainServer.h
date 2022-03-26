@@ -37,12 +37,12 @@ public:
     Cryption encrypt(string text);
 
     int start();
-    string parseGetReq(string req);
+    static string parseGetReq(string req);
     int getNodeAmount(int min, int max);
-    string welcome();
-    string help();
+    static string welcome();
+    static string help();
 
-    string notFound();
+    static string notFound();
 
     string decrypt(Cryption &c);
 
