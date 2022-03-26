@@ -25,7 +25,8 @@ Run the program and visit localhost:777/ for instructions.
 
 <h3>Master branch</h3>
 The master branch contains the program where the routing works. There is no encryption/decryption, but the get-request from the
-client is sent through different nodes. A good testsite is http://localhost:777/www.softwareqatest.com/
+client is sent through different nodes. A good testsite is http://localhost:777/www.softwareqatest.com/. It is important to end
+the url with '/' if you are visiting a home page.
 
 <h3>Node-with-enc</h3>
 This branch contains the onion router. Sending the get-request from the client to the exit-node is usually
@@ -64,10 +65,12 @@ how the encryption/decryption works when reading the console.
 
 Windows lib for creating sockets in C++
 
+https://docs.microsoft.com/en-us/windows/win32/winsock/getting-started-with-winsock
+
 <h3>OpenSSL</h3>
 https://www.openssl.org/docs/man3.0/man3/
 
-We had sadly some problems with the encryption/decryption in OpenSSL. For each run some of the data is being 
+We sadly had some problems with the encryption/decryption in OpenSSL. For each run some of the data is being 
 corrupted. It might have something to do with the secret keys, since different data is being corrupted each run.
 There is also very limited documentation of the library. 
 
@@ -79,9 +82,9 @@ We used these classes from OpenSSL:
     - EVP (AES)
       https://wiki.openssl.org/index.php/EVP_Symmetric_Encryption_and_Decryption
 
-The project proved to be quite challenging, and as a result not everything is as they should be.
-<h3>Here comes a list of known bugs and weaknesses:</h3>
-
+<h3>Known bugs and weaknesses that should be improved upon in later versions:</h3>
+    
+    - Onion router doesn't work
     - Routing is not compatible with images.
     - If a page that contains images is loaded, the system fails.
     - Routing only works with some HTTP websites. The requirement for routing is that you can get the 
