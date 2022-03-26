@@ -3,61 +3,12 @@
 //
 
 #include "MainServer.h"
-#include "../socket/SocketGetters.h"
 #include <limits>
 #include <thread>
 #include <regex>
-#include "../security/diffie-helman/Handshake.h"
-#include "../security/string-modifier/StringModifier.h"
 #include "../security/aes/Crypter.h"
 
-
-bool MainServer::generateKeys(){
-    for(auto it = begin(userNodes); it != end(userNodes)-1; it++){
-        long long int num = StringModifier::BN2LLI(Handshake::doHandshake(it->decryptKey, std::next(it)->encryptKey));
-        keys.push_back(num);
-    }
-
-}
-
-Cryption MainServer::encrypt(string text){
-    vector<Cryption> c;
-    c.push_back(Crypter::encrypt(text, keys[0]));
-    for(int i = 1; i < userNodes.size()-1; i++){
-        c.push_back(Crypter::encrypt(c[i-1], keys[i]));
-    }
-
-    return c[userNodes.size()-2];
-}
-
-string MainServer::decrypt(Cryption &c) {
-    Cryption text;
-    vector<Cryption> cr;
-    vector<string> s;
-    cr.push_back(c);
-    int x = 0;
-    for(int i = userNodes.size()-2; i >= 0; i--){
-        text = Crypter::decrypt(cr[x], keys[i]);
-        cr.push_back(text);
-        x++;
-    }
-    return StringModifier::cryptionToString(cr[userNodes.size()-1]);
-}
-
-MainServer::MainServer(int numberOfNodes) {
-    for (int i = 0; i < numberOfNodes; i++) {
-        Node n;
-        userNodes.push_back(n);
-    }
-    generateKeys();
-}
-
-void generateKeys(){
-
-}
-
 //Websites for testing: www.example.com, www.softwareqatest.com, www.columbia.edu/~fdc/sample.html (something goes wrong here), www.virtu-software.com (something goes wrong here)
-
 /**
  * Starts the application letting the user connect to a socket on port 777
  *
@@ -97,8 +48,7 @@ int MainServer::start() {
             end = userRequest.find("\r\n\r\n");
             if(end == string::npos) continue; //If we don't have the entire get request, continue to next iteration and get more of it
             userCommand = parseGetReq(userRequest);
-            //cout<<userRequest<<endl;
-            cout<<userCommand<<endl;
+            cout<<"User sent in "<<userCommand<<endl;
             if(userCommand == "exit") continue; //TODO maybe exit cleaner
             if(userCommand == "INVALID") {
                 cout << "An invalid request was sent to the server" << endl;
@@ -141,9 +91,6 @@ int MainServer::start() {
                 string response; //Gathering all response information in a string
                 do {
                     iResult = recv(connectSocket, recvbuf, recvbuflen, 0); //Receiving from nextNode
-                    //string recBufStr(recvbuf);
-                    //cout<<recBufStr<<endl;
-                    //if(recBufStr.find("</html>") != string::npos) break; //Found end of html, breaking loop
                     if (iResult > 0) {
                         printf("Bytes received: %d", iResult);
                         response += string(recvbuf).substr(0, iResult);
@@ -163,11 +110,7 @@ int MainServer::start() {
                 size_t headerEndPos = response.find("\r\n\r\n");
                 //Getting only the part of the response we need
                 response = response.substr(0, contLen + headerEndPos + 4); //Need offset to account for newlines
-                //cout <<response<< endl;
-                cout <<response<< endl;
-                cout << "Header end "<<headerEndPos << endl;
-                cout << "Cont len "<<contLen << endl;
-                //cout << recvbuf << endl;
+
                 printf("final %d\n", iSendResult);
 
                 //Threads are done
@@ -183,7 +126,6 @@ int MainServer::start() {
                 if (iSendResult == SOCKET_ERROR) {
                     printf("HAPPENED IN MAINSERVER PLACE 2");
                     printf("send failed: %d\n", WSAGetLastError());
-                    cout << recvbuf << endl;
                     closesocket(clientConnection);
                     WSACleanup();
                     return 1;
@@ -215,6 +157,7 @@ int MainServer::start() {
                 WSACleanup();
                 return 1;
             }
+            cout<<"Ready for new command/URL"<<endl;
         }
         else{
             printf("recv failed: in mainserver %d\n", WSAGetLastError());

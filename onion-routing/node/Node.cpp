@@ -5,14 +5,13 @@
 #include <winsock2.h>
 #include "Node.h"
 #include <iostream>
-#include <ws2tcpip.h>
 #include <regex>
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
 void Node::initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp) {
 
-    SOCKET ListenSocket = getListenSocket(listenPort); //Making a socket listen on given port
+    SOCKET ListenSocket = SocketGetters::getListenSocket(listenPort); //Making a socket listen on given port
 
     SOCKET ClientSocket = INVALID_SOCKET;
 
@@ -42,10 +41,8 @@ void Node::initialize_server_socket(const char *listenPort, const char *connectP
         iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
         printf("Bytes received: %d\n", iStart);
         initial_user_req += string(recvbuf).substr(0, iStart); //Gathering user request in a string
-        //cout << recvbuf << endl;
         iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
-        //cout << "Received from prev: " << initial_user_req << "\n" << endl;
 
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);

@@ -3,7 +3,6 @@
 //
 
 #include <winsock2.h>
-#include <ws2tcpip.h>
 #include "ExitNode.h"
 
 /**
@@ -45,10 +44,8 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
             iStart = recv(ClientSocket, recvbuf, recvbuflen, 0); //Initial request from prev/client
             printf("Bytes received: %d\n", iStart);
             initial_user_req += string(recvbuf).substr(0, iStart); //Gathering user request in a string
-            cout << recvbuf << endl << endl;
             iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
-        cout << "Received from prev: " << initial_user_req << "\n" << endl;
 
         //Extracting domain name and path in user request. Test webpage input www.softwareqatest.com/qatfaq2.html
         int spaces_until_sep;
@@ -60,12 +57,9 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
         int path_length = stoi(initial_user_req.substr(spaces_until_sep + 1, first_ln_len - spaces_until_sep + 1));
         if(path_length == 0) path_length = -1;
 
-        cout << "Domain length: " <<domain_length << " Path length: " << path_length << endl;
         size_t hostPos = initial_user_req.find("Host: ");
         string domain_name = initial_user_req.substr(hostPos + 6, domain_length);
-        cout<<"domain_name "<<domain_name<<endl;
         initial_user_req = initial_user_req.substr(first_ln_len + 2, initial_user_req.length()); //Removing first line of request, no longer any need
-        //cout << initial_user_req << endl;
 
         //getting IP address from domain sent in by user
         hostent *webDomain = gethostbyname(domain_name.c_str());
@@ -78,7 +72,6 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
 
             addr = reinterpret_cast<in_addr*>(temp);
         }
-        //cout<<inet_ntoa(*addr)<<endl;
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 

@@ -83,7 +83,6 @@ SOCKET SocketGetters::getListenSocket(const char *port_nr){
     WSAData wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-    //std::cout << "Initializing winosck..." << std::endl;
     if (iResult != 0) {
         std::cout << "Something went wrong " << WSAGetLastError() << std::endl;
         return NULL;
@@ -148,7 +147,7 @@ char* SocketGetters::getLocalhostIP(){
    WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
-        std::cout << "Something went wrong " << WSAGetLastError() << std::endl;
+        cout << "Something went wrong " << WSAGetLastError() << endl;
         return NULL;
     }
 

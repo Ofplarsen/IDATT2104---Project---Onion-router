@@ -18,7 +18,6 @@
 
 class ExitNode : public Node{
 public:
-    void sendGetRequest(const char *ip, const char *port);
     void initialize_server_socket(const char *listenPort);
 };
 
