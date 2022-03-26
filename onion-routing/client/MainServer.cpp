@@ -82,6 +82,10 @@ string MainServer::receiveMessage(Cryption &c){
 
 //Websites for testing: www.example.com, www.softwareqatest.com, www.columbia.edu/~fdc/sample.html (something goes wrong here), www.virtu-software.com (something goes wrong here)
 
+/**
+ * Starts the application letting the user connect to a socket on port 777
+ * @return 0 if exited cleanly, 1 if not
+ */
 int MainServer::start() {
     //create nodePool with x Nodes and give them their
     //nodeAmount = getNodeAmount(3, 12);
@@ -122,7 +126,6 @@ int MainServer::start() {
             end = userRequest.find("\r\n\r\n");
             if(end == string::npos) continue; //If we don't have the entire get request, continue to next iteration and get more of it
             userCommand = parseGetReq(userRequest);
-            //cout<<userRequest<<endl;
             cout<<userCommand<<endl;
             if(userCommand == "INVALID") {
                 cout << "An invalid request was sent to the server" << endl;
@@ -144,12 +147,7 @@ int MainServer::start() {
             }
             //if user sends in something else than preprogrammed cases, send to InputNode from userNodes vector and hope for the best
             else if(regex_match(userCommand, pattern)){
-                for(int i = 0; i < userNodes.size(); i++){
-                    userNodes[i].printError();
-                }
-//                std::thread t1(&InputNode::receiveAndSend, &userInputNode);
-//                std::thread t2(&Node::receiveAndSend, &userNodes[1]);
-//                std::thread t3(&ExitNode::receiveAndSend, &userExitNode);
+
                 Node n1;
                 InputNode inp1;
                 ExitNode exn1;
@@ -293,6 +291,11 @@ int MainServer::start() {
     return 0;
 }
 
+/**
+ * Parses get request from browser to find command sent in by user
+ * @param req request from browser
+ * @return a string containing the user command
+ */
 string MainServer::parseGetReq(string req){ //TODO make req const -Clang(?)
     string firstLineEnd = " HTTP/1.1\r\n";
     int firstLineEndPos = req.find(firstLineEnd);
@@ -301,6 +304,13 @@ string MainServer::parseGetReq(string req){ //TODO make req const -Clang(?)
     return command;
 }
 
+/**
+ * deprecated
+ * Lets user choose a number in a range for how many Nodes they want to use.
+ * @param min minimum amount of Nodes
+ * @param max maximum amount of Nodes
+ * @return amount of Nodes the user wants
+ */
 int MainServer::getNodeAmount(int min, int max){
     int nodeAmountPlaceholder;
     cout << "Enter how many nodes you want to use, minimum " << min << " and maximum " << max << endl;
@@ -312,9 +322,13 @@ int MainServer::getNodeAmount(int min, int max){
     return nodeAmountPlaceholder;
 }
 
+/**
+ * HTTP response greeting the user.
+ * @return a string containing the HTTP greeting
+ */
 string MainServer::welcome(){
     string body =
-            "<h1>Welcome to the Shrouter</h1>\r\n"
+            "<h1>Welcome to the Simple router</h1>\r\n"
             "<p>This is a prototype implementation of an onion router</p>\r\n"
             "<p>To navigate to the help page, enter '<a href=\"http://localhost:777/help\">localhost:777/help</a>' in the address bar</p>"; //TODO refactor the portnr if it changes
     string welcome = "HTTP/1.1 200 OK\r\n"
@@ -325,6 +339,10 @@ string MainServer::welcome(){
     return welcome;
 }
 
+/**
+ * HTTP used to give simple info to user.
+ * @return
+ */
 string MainServer::help(){
     string body =
             "<h1>Help</h1>\r\n"
@@ -347,12 +365,20 @@ string MainServer::help(){
     return help;
 }
 
+/**
+ * HTTP used if a command is not found.
+ * @param command the command that is not found
+ * @return
+ */
 string MainServer::notFound(){
     string notFound = "HTTP/1.0 404 Not Found\r\n"
                       "Connection: Close\r\n\r\n";
     return notFound;
 }
 
+/**
+ * Constructs Nodes and assigns them to appropriate variables
+ */
 void MainServer::initNodes(const char* ip){
     userInputNode = InputNode("8081", "8087", ip);
     userNodes.push_back(userInputNode);
@@ -363,6 +389,11 @@ void MainServer::initNodes(const char* ip){
     userNodes.push_back(userExitNode);
 }
 
+/**
+ * Splits info string and returns how many blocks, block size and size of last block
+ * @param s string whose info you want to extract
+ * @return vector containing the info
+ */
 vector<int> MainServer::split(string s){
     vector<int> info;
     std::string delimiter = "|";

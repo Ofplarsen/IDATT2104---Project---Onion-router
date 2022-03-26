@@ -4,19 +4,22 @@
 
 #include <winsock2.h>
 #include "Node.h"
-#include "../security/model/Cryption.h"
 #include "../security/aes/Crypter.h"
 #include "../security/string-modifier/StringModifier.h"
 #include <iostream>
-#include <winsock2.h>
-#include <ws2tcpip.h>
 #include <regex>
 
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
+/**
+ * Initializes a Node that receives and sends data to the Nodes that this one is connected.
+ * @param listenPort port which the Node listens for connections on
+ * @param connectPort port used to connect to next Node
+ * @param connectIp IP used to connect to next Node
+ */
 void Node::initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp) {
 
-    SOCKET ListenSocket = getListenSocket(listenPort); //Making a socket listen on given port
+    SOCKET ListenSocket = SocketGetters::getListenSocket(listenPort); //Making a socket listen on given port
 
     SOCKET ClientSocket = INVALID_SOCKET;
 
@@ -48,26 +51,19 @@ void Node::initialize_server_socket(const char *listenPort, const char *connectP
             printf("Bytes received: %d\n", iStart);
             cout << WSAGetLastError() << endl;
             cout<< "Received from Main: " <<recvbuf<<endl;
-            //cout << "\nSubstring created: \n" << string(recvbuf).substr(0, iStart) << endl;
             initial_user_req.append(string(recvbuf, iStart).substr(0, iStart));
             iResult = iStart;
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
-        //cout << "Received from prev: " << initial_user_req << "\n" << endl;
 
         if (iResult > 0) {
             size_t end;
             string info;
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET web_page_socket = getConnectSocket(connectIp, connectPort);
+            SOCKET web_page_socket = SocketGetters::getConnectSocket (connectIp, connectPort);
             cout << "\nAs whole string: \n" << initial_user_req << endl;
             iResult = iStart;
-            //cout << initial_user_req << endl;
-            //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
-//        vector<string> parsed = parse_initial_request(initial_user_req); //Contains domain_name and path
-//
-//        //constructing a get request that the node will send to socket on internet
-//        string getReq = construct_get_request(parsed.at(0), parsed.at(1));
+
             end = initial_user_req.find("\r\n");
             if(end != string::npos){
                 info = initial_user_req.substr(0, end);
@@ -116,7 +112,6 @@ void Node::initialize_server_socket(const char *listenPort, const char *connectP
             do {
                 iResult = recv(web_page_socket, recvbuf, recvbuflen, 0); //Receiving from nextNode
 
-
                 if (iResult > 0) {
                     printf("Bytes received: %d.\n", iResult);
                     receiveRequest+=string(recvbuf, iResult).substr(0, iResult);
@@ -143,6 +138,7 @@ void Node::initialize_server_socket(const char *listenPort, const char *connectP
             returnVal1 = info1 + "\r\n" += enc;
             cout<< "IN NODE:\n" << returnVal1 << endl;
             iSendResult = send(ClientSocket, returnVal1.c_str(), returnVal1.length(), 0); //Sending back to prevNode immediately
+
             //Sending back to prevNode immediately
             if (iSendResult == SOCKET_ERROR) {
                 printf("send failed: %d\n", WSAGetLastError());
@@ -182,122 +178,6 @@ void Node::initialize_server_socket(const char *listenPort, const char *connectP
     WSACleanup();
 }
 
-
-SOCKET Node::getConnectSocket(const char *ip, const char *port) {
-    WSADATA wsaData;
-    int iResult;
-
-    // Initialize Winsock
-    iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (iResult != 0) {
-        printf("WSAStartup failed: %d\n", iResult);
-        return NULL;
-    }
-
-    struct addrinfo *result = NULL,
-            *ptr = NULL,
-            hints;
-
-    ZeroMemory( &hints, sizeof(hints) );
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-
-    // Resolve the server address and port
-    iResult = getaddrinfo(ip, port, &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed: %d\n", iResult);
-        WSACleanup();
-        return NULL;
-    }
-
-    SOCKET ConnectSocket = INVALID_SOCKET;
-
-    // Attempt to connect to the first address returned by
-    // the call to getaddrinfo
-    ptr=result;
-
-    // Create a SOCKET for connecting to server
-    ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
-                           ptr->ai_protocol);
-
-    if (ConnectSocket == INVALID_SOCKET) {
-        printf("Error at socket(): %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return NULL;
-    }
-
-    // Connect to server.
-    iResult = ::connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        closesocket(ConnectSocket);
-        ConnectSocket = INVALID_SOCKET;
-    }
-
-    return ConnectSocket;
-}
-
-SOCKET Node::getListenSocket(const char *port_nr){
-    WSAData wsaData;
-    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-    std::cout << "Initializing winosck..." << std::endl;
-    if (iResult != 0) {
-        std::cout << "Something went wrong " << WSAGetLastError() << std::endl;
-        return NULL;
-    }
-
-    struct addrinfo *result = NULL, *ptr = NULL, hints;
-
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = AI_PASSIVE;
-
-    // Resolve the local address and port to be used by the server
-    iResult = getaddrinfo(NULL, port_nr, &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed: %d\n", iResult);
-        WSACleanup();
-        return NULL;
-    }
-
-    SOCKET ListenSocket = INVALID_SOCKET;
-
-    // Create a SOCKET for the server to listen for client connections
-    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (ListenSocket == INVALID_SOCKET) {
-        printf("Error at socket(): %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return NULL;
-    }
-
-    // Setup the TCP listening socket
-    iResult = bind(ListenSocket, result->ai_addr, (int) result->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        printf("bind failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(result);
-        closesocket(ListenSocket);
-        WSACleanup();
-        return NULL;
-    }
-
-    freeaddrinfo(result);
-
-    if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR ) {
-        printf( "Listen failed with error: %ld\n", WSAGetLastError() );
-        closesocket(ListenSocket);
-        WSACleanup();
-        return NULL;
-    }
-
-    return ListenSocket;
-}
-
 /**
  * Method that encrypts a string and returns a string
  * @param message
@@ -314,6 +194,7 @@ string Node::encrypt(string message) {
     }
     return encrypted;
 }
+
 /**
  * Method that decrypts a Cryption and returns as string
  * @param message
@@ -332,6 +213,11 @@ string Node::decrypt(Cryption &message) {
     return decrypted;
 }
 
+/**
+ * Splits info string and returns how many blocks, block size and size of last block
+ * @param s string whose info you want to extract
+ * @return vector containing the info
+ */
 vector<int> Node::split(string s){
     vector<int> info;
     std::string delimiter = "|";
@@ -357,12 +243,7 @@ vector<int> Node::split(string s){
     return info;
 }
 
-Node::Node() {
-
-}
-
-void Node::printError(){
-    cout << this->connectPort << endl;
-    cout << this->listenPort << endl;
-    cout << this->connectIp << endl;
-}
+/**
+ * Basic constructor
+ */
+Node::Node() {}

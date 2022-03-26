@@ -20,7 +20,6 @@ protected:
     const char *connectPort;
     const char *connectIp;
 private:
-
     string message;
 public:
     Node();
@@ -34,18 +33,9 @@ public:
     string encrypt(string message);
 
     void initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp);
-    SOCKET getConnectSocket(const char *ip, const char *port);
-    SOCKET getListenSocket(const char *port_nr);
-
-
 
     string decrypt(Cryption &message);
-
-
     vector<int> split(string s);
-
-
-    void printError();
 };
 
 
