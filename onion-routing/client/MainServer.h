@@ -13,12 +13,6 @@
 using namespace std;
 class MainServer {
 private:
-    Node node; //Byttes ut med socket
-    vector<Node> userNodes;
-
-    bool generateKeys();
-
-    string decrypt();
     vector <InputNode> inputNodePool; //Amount: 5
     vector <Node> nodePool; //Amount: 10
     vector <ExitNode> exitNodePool; //Amount: 5
@@ -27,26 +21,22 @@ private:
     SOCKET forward; //Used to forward information to Nodes
 
     int nodeAmount; //Amount of nodes
+    vector <Node> userNodes;
+    vector <Key> keys;
 public:
-    MainServer(int numberOfNodes);
-    vector<long long int> keys;
-    const vector<Node> &getUserNodes() const;
 
-    Cryption encrypt(string text);
-
+    void generateKeys();
     int start();
     string parseGetReq(string req);
     int getNodeAmount(int min, int max);
     string welcome();
     string help();
 
-    string notFound();
+    string notFound(string command);
 
-    string decrypt(Cryption &c);
+    void traverseNodes(string userRequest, const char* localhost, SOCKET clientConnection, char* recvbuf, int recvbuflen);
 
-    void sendMessage(string message);
-
-    void receiveMessage(Cryption &c);
+    string getLocalhostIpFromUser();
 };
 
 

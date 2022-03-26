@@ -12,6 +12,7 @@ bool Handshake::doHandshake(Node n1, Node n2) {
 //    }catch (int num){
 //        return false;
 //    }
+return false;
 }
 
 BIGNUM * Handshake::doHandshake(Key &k1, Key &k2) {

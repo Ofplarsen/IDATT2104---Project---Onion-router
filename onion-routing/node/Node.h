@@ -10,7 +10,6 @@
 #include <winsock.h>
 #include "../security/key/Key.h"
 #include "../socket/SocketGetters.h"
-#include "../security/model/Cryption.h"
 
 using namespace std;
 
@@ -21,8 +20,6 @@ private:
     Key public_key;
     string message;
 public:
-    Key encryptKey;
-    Key decryptKey;
     Node *prevNode;
     Node *nextNode;
     string encrypt(string message);
@@ -35,23 +32,6 @@ public:
     void initialize_server_socket(const char *listenPort, const char *connectPort, const char *connectIp);
     SOCKET getConnectSocket(const char *ip, const char *port);
     SOCKET getListenSocket(const char *port_nr);
-
-
-    Cryption encrypt(Cryption message);
-
-    Cryption encryptC(string message);
-
-    Cryption decryptC(Cryption message);
-
-    string decrypt(Cryption &message);
-
-    Cryption encryptC(Cryption &c);
-
-    Cryption decryptC(vector<string> msg, vector<int> length);
-
-    Cryption buildCryption(string message, string len);
-
-    string buildString(Cryption &c);
 };
 
 

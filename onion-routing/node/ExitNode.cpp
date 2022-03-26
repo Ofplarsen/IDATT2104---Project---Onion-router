@@ -6,144 +6,16 @@
 #include <ws2tcpip.h>
 #include "ExitNode.h"
 
-void ExitNode::sendGetRequest(const char *ip, const char *port) {
-    WSADATA wsaData;
-    int iResult;
-
-    // Initialize Winsock
-    iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (iResult != 0) {
-        printf("WSAStartup failed: %d\n", iResult);
-        return;
-    }
-
-    struct addrinfo *result = NULL,
-            *ptr = NULL,
-            hints;
-
-    ZeroMemory( &hints, sizeof(hints) );
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-#define DEFAULT_TLS_PORT = "433"
-
-    // Resolve the server address and port
-    iResult = getaddrinfo(ip, port, &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed: %d\n", iResult);
-        WSACleanup();
-        return;
-    }
-
-    SOCKET ConnectSocket = INVALID_SOCKET;
-
-    // Attempt to connect to the first address returned by
-    // the call to getaddrinfo
-    ptr=result;
-
-    // Create a SOCKET for connecting to server
-    ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
-                           ptr->ai_protocol);
-
-    if (ConnectSocket == INVALID_SOCKET) {
-        printf("Error at socket(): %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return;
-    }
-
-    // Connect to server.
-    iResult = ::connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        closesocket(ConnectSocket);
-        ConnectSocket = INVALID_SOCKET;
-    }
-
-    // Should really try the next address returned by getaddrinfo
-    // if the connect call failed
-    // But for this simple example we just free the resources
-    // returned by getaddrinfo and print an error message
-
-    freeaddrinfo(result);
-
-    if (ConnectSocket == INVALID_SOCKET) {
-        printf("Unable to connect to server!\n");
-        WSACleanup();
-        return;
-    }
-
-#define DEFAULT_BUFLEN 512
-
-    int recvbuflen = DEFAULT_BUFLEN;
-
-    const char *sendbuf = "GET / HTTP/1.1\r\n"
-                          "Host: localhost:1250\r\n"
-                          "Connection: keep-alive\r\n"
-                          "Cache-Control: max-age=0\r\n"
-                          "sec-ch-ua: \" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"\r\n"
-                          "sec-ch-ua-mobile: ?0\r\n"
-                          "sec-ch-ua-platform: \"Windows\"\r\n"
-                          "Upgrade-Insecure-Requests: 1\r\n"
-                          "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36\r\n"
-                          "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\n"
-                          "Sec-Fetch-Site: none\r\n"
-                          "Sec-Fetch-Mode: navigate\r\n"
-                          "Sec-Fetch-User: ?1\r\n"
-                          "Sec-Fetch-Dest: document\r\n"
-                          "Accept-Encoding: gzip, deflate, br\r\n"
-                          "Accept-Language: nb-NO,nb;q=0.9,no;q=0.8,nn;q=0.7,en-US;q=0.6,en;q=0.5,de;q=0.4\r\n\r\n";
-
-    char recvbuf[DEFAULT_BUFLEN];
-
-    // Send an initial buffer
-    iResult = send(ConnectSocket, sendbuf, (int) strlen(sendbuf), 0);
-    if (iResult == SOCKET_ERROR) {
-        printf("send failed: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return;
-    }
-
-    printf("Bytes Sent: %ld\n", iResult);
-
-// shutdown the connection for sending since no more data will be sent
-// the client can still use the ConnectSocket for receiving data
-    iResult = shutdown(ConnectSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return;
-    }
-
-    // Receive data until the server closes the connection
-    do {
-        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-        if (iResult > 0)
-            printf("Bytes received: %d\n", iResult);
-        else if (iResult == 0)
-            printf("Connection closed\n");
-        else
-            printf("recv failed: %d\n", WSAGetLastError());
-    } while (iResult > 0);
-
-    iResult = shutdown(ConnectSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed: %d\n", WSAGetLastError());
-        closesocket(ConnectSocket);
-        WSACleanup();
-        return;
-    }
-
-    closesocket(ConnectSocket);
-    WSACleanup();
-
-}
-
+/**
+ * Initializes an ExitNode which listens on a given port. The data received from previous Nodes is used to figure out
+ * which website ExitNode should redirect the data to, and sends it to the given HTTP website. The response is then sent
+ * bak to the previous Nodes.
+ *
+ * @param listenPort port used to listen for connections
+ */
 void ExitNode::initialize_server_socket(const char *listenPort) {
 
-    SOCKET ListenSocket = getListenSocket(listenPort); //Making a socket listen on given port
+    SOCKET ListenSocket = SocketGetters::getListenSocket(listenPort); //Making a socket listen on given port
 
     SOCKET ClientSocket = INVALID_SOCKET;
 
@@ -157,11 +29,12 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
         return;
     }
 
-#define DEFAULT_BUFLEN 512
+    #define DEFAULT_BUFLEN 512
 
     int recvbuflen = DEFAULT_BUFLEN;
     int iSendResult;
     int iStart;
+    int iResult;
 
     // Receive until the peer shuts down the connection
     char recvbuf[DEFAULT_BUFLEN];
@@ -209,7 +82,7 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET web_page_socket = getConnectSocket(inet_ntoa(*addr), "80"); //HTTP listens on port 80
+            SOCKET web_page_socket = SocketGetters::getConnectSocket(inet_ntoa(*addr), "80"); //HTTP listens on port 80
             iSendResult = send(web_page_socket, initial_user_req.c_str(), initial_user_req.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("HAPPENED IN EXITNODE PLACE 1");
@@ -229,6 +102,7 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
                 return;
             }
 
+            //Redirecting response directly
             do {
                 iResult = recv(web_page_socket, recvbuf, recvbuflen, 0); //Receiving from nextNode
                 iSendResult = send(ClientSocket, recvbuf, recvbuflen, 0); //Sending back to prevNode immediately
@@ -280,120 +154,3 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
     closesocket(ListenSocket);
     WSACleanup();
 }
-
-SOCKET ExitNode::getConnectSocket(const char *ip, const char *port) {
-    WSADATA wsaData;
-    int iResult;
-
-    // Initialize Winsock
-    iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (iResult != 0) {
-        printf("WSAStartup failed: %d\n", iResult);
-        return NULL;
-    }
-
-    struct addrinfo *result = NULL,
-            *ptr = NULL,
-            hints;
-
-    ZeroMemory( &hints, sizeof(hints) );
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-#define DEFAULT_TLS_PORT = "433"
-
-    // Resolve the server address and port
-    iResult = getaddrinfo(ip, port, &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed: %d\n", iResult);
-        WSACleanup();
-        return NULL;
-    }
-
-    SOCKET ConnectSocket = INVALID_SOCKET;
-
-    // Attempt to connect to the first address returned by
-    // the call to getaddrinfo
-    ptr=result;
-
-    // Create a SOCKET for connecting to server
-    ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
-                           ptr->ai_protocol);
-
-    if (ConnectSocket == INVALID_SOCKET) {
-        printf("Error at socket(): %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return NULL;
-    }
-
-    // Connect to server.
-    iResult = ::connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        closesocket(ConnectSocket);
-        ConnectSocket = INVALID_SOCKET;
-    }
-
-    return ConnectSocket;
-}
-
-SOCKET ExitNode::getListenSocket(const char *port_nr) {
-    WSAData wsaData;
-    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-    std::cout << "Initializing winosck..." << std::endl;
-    if (iResult != 0) {
-        std::cout << "Something went wrong " << WSAGetLastError() << std::endl;
-        return NULL;
-    }
-
-    struct addrinfo *result = NULL, *ptr = NULL, hints;
-
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = AI_PASSIVE;
-
-    // Resolve the local address and port to be used by the server
-    iResult = getaddrinfo(NULL, port_nr, &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed: %d\n", iResult);
-        WSACleanup();
-        return NULL;
-    }
-
-    SOCKET ListenSocket = INVALID_SOCKET;
-
-    // Create a SOCKET for the server to listen for client connections
-    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (ListenSocket == INVALID_SOCKET) {
-        printf("Error at socket(): %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return NULL;
-    }
-
-    // Setup the TCP listening socket
-    iResult = bind(ListenSocket, result->ai_addr, (int) result->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        printf("bind failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(result);
-        closesocket(ListenSocket);
-        WSACleanup();
-        return NULL;
-    }
-
-    freeaddrinfo(result);
-
-    if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR ) {
-        printf( "Listen failed with error: %ld\n", WSAGetLastError() );
-        closesocket(ListenSocket);
-        WSACleanup();
-        return NULL;
-    }
-
-    return ListenSocket;
-}
-

@@ -10,6 +10,14 @@
 #pragma comment(lib,"ws2_32.lib") //Winsock Library
 
 using namespace std;
+
+/**
+ * Static helper method that initializes and returns a winsock that connects to another socket given IP and port number.
+ *
+ * @param ip IP of the socket that should be connected to
+ * @param port ort number of the socket that should be connected to
+ * @return a socket that is connected to another socket if successful, and NULL if something goes wrong along the way
+ */
 SOCKET SocketGetters::getConnectSocket(const char *ip, const char *port) {
     WSADATA wsaData;
     int iResult;
@@ -66,6 +74,11 @@ SOCKET SocketGetters::getConnectSocket(const char *ip, const char *port) {
     return ConnectSocket;
 }
 
+/**
+ * Static helper method that initializes and returns a socket that listens on some port
+ * @param port_nr the port the listen socket listens to
+ * @return a socket that listens on a port
+ */
 SOCKET SocketGetters::getListenSocket(const char *port_nr){
     WSAData wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -125,6 +138,12 @@ SOCKET SocketGetters::getListenSocket(const char *port_nr){
     return ListenSocket;
 }
 
+/**
+ * deprecated, did not work as intended
+ * Finds and returns the IP of localhost on a machine.
+ *
+ * @return IP of localhost
+ */
 char* SocketGetters::getLocalhostIP(){
    WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);

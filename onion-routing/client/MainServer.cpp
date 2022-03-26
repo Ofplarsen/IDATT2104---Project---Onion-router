@@ -2,7 +2,6 @@
 // Created by xray2 on 14/03/2022.
 //
 
-#include <iostream>
 #include "MainServer.h"
 #include "../socket/SocketGetters.h"
 #include <limits>
@@ -53,38 +52,31 @@ MainServer::MainServer(int numberOfNodes) {
     generateKeys();
 }
 
-const vector<Node> &MainServer::getUserNodes() const {
-    return userNodes;
-}
+void generateKeys(){
 
-void MainServer::sendMessage(string message){
-    Cryption encrypted = encrypt(message);
-}
-
-void MainServer::receiveMessage(Cryption &c){
-    string t = decrypt(c);
-    cout << t << endl;
 }
 
 //Websites for testing: www.example.com, www.softwareqatest.com, www.columbia.edu/~fdc/sample.html (something goes wrong here), www.virtu-software.com (something goes wrong here)
 
+/**
+ * Starts the application letting the user connect to a socket on port 777
+ *
+ * @return 0 if exited cleanly, 1 if not
+ */
 int MainServer::start() {
-    //create nodePool with x Nodes and give them their
-    //ask for nodeAmount, at least 3
-    nodeAmount = /*getNodeAmount(3, 12);*/ 3;
-    const char* localhost = "192.168.1.14";
-    //pick nodeAmount Nodes from pool
+    //Getting localhosts IP from user
+    const char* localhost = getLocalhostIpFromUser().c_str(); //"192.168.56.1";
     //inform user about what to do next (log on with browser)
     cout << "Please go to your preferred browser and enter 'localhost:777' to begin using the program." << endl;
     //initiate server socket and forward socket
-    SOCKET mainServer = SocketGetters::getListenSocket("777"); //TODO maybe randomly generate port_nr for security reasons?
+    SOCKET mainServer = SocketGetters::getListenSocket("777");
     SOCKET clientConnection = INVALID_SOCKET;
     clientConnection = accept(mainServer, NULL, NULL); //Trying to accept a client connection
     if (clientConnection == INVALID_SOCKET) {
         printf("accept failed: %d\n", WSAGetLastError());
         closesocket(mainServer);
         WSACleanup();
-        return -1;
+        return 1;
     }
 
     #define DEFAULT_BUFLEN 512
@@ -107,6 +99,7 @@ int MainServer::start() {
             userCommand = parseGetReq(userRequest);
             //cout<<userRequest<<endl;
             cout<<userCommand<<endl;
+            if(userCommand == "exit") continue; //TODO maybe exit cleaner
             if(userCommand == "INVALID") {
                 cout << "An invalid request was sent to the server" << endl;
                 break;
@@ -117,7 +110,7 @@ int MainServer::start() {
                 send(clientConnection, welcomeMsg.c_str(), welcomeMsg.length(), 0);
             }
             else if(userCommand == "favicon.ico"){
-                string notFoundMsg = notFound();
+                string notFoundMsg = notFound(userCommand);
                 send(clientConnection, notFoundMsg.c_str(), notFoundMsg.length(), 0);
             }
             //type localhost:x/help for help
@@ -134,7 +127,7 @@ int MainServer::start() {
                 std::thread t2(&Node::initialize_server_socket, &n1, "8087", "8080", localhost);
                 std::thread t3(&ExitNode::initialize_server_socket, &exn1, "8080");
 
-                SOCKET connectSocket = SocketGetters::getConnectSocket("192.168.1.14", "8081");
+                SOCKET connectSocket = SocketGetters::getConnectSocket(localhost, "8081");
                 iSendResult = send(connectSocket, userRequest.c_str(), userRequest.length(), 0);
                 if (iSendResult == SOCKET_ERROR) {
                     printf("HAPPENED IN MAINSERVER PLACE 1");
@@ -169,7 +162,7 @@ int MainServer::start() {
                 //Finding how long the headers are
                 size_t headerEndPos = response.find("\r\n\r\n");
                 //Getting only the part of the response we need
-                response = response.substr(0, contLen + headerEndPos + 4); //TODO not sure why the offset works, but it does
+                response = response.substr(0, contLen + headerEndPos + 4); //Need offset to account for newlines
                 //cout <<response<< endl;
                 cout <<response<< endl;
                 cout << "Header end "<<headerEndPos << endl;
@@ -182,6 +175,9 @@ int MainServer::start() {
                 t2.join();
                 t3.join();
 
+                //Images not yet supported, if headers include image/jpeg, send 404 to user
+                if(response.find("Content-Type: image/jpeg") != string::npos) response = MainServer::notFound("image");
+
                 //Sending back to client
                 iSendResult = send(clientConnection, response.c_str(), response.length(), 0);
                 if (iSendResult == SOCKET_ERROR) {
@@ -190,12 +186,12 @@ int MainServer::start() {
                     cout << recvbuf << endl;
                     closesocket(clientConnection);
                     WSACleanup();
-                    return -4;
+                    return 1;
                 }
             }
             //If command is not found
             else{
-                string notFoundMsg = notFound();
+                string notFoundMsg = notFound(userCommand);
                 send(clientConnection, notFoundMsg.c_str(), notFoundMsg.length(), 0);
             }
         }
@@ -207,7 +203,7 @@ int MainServer::start() {
                 printf("shutdown failed: %d\n", WSAGetLastError());
                 closesocket(clientConnection);
                 WSACleanup();
-                return -2;
+                return 1;
             }
             closesocket(clientConnection); //Closing the clientConnection
 
@@ -217,14 +213,14 @@ int MainServer::start() {
                 printf("accept failed: %d\n", WSAGetLastError());
                 closesocket(mainServer);
                 WSACleanup();
-                return -1;
+                return 1;
             }
         }
         else{
-            printf("recv failed: %d\n", WSAGetLastError());
+            printf("recv failed: in mainserver %d\n", WSAGetLastError());
             closesocket(clientConnection);
             WSACleanup();
-            return -3;
+            return 1;
         }
     } while(userCommand != "exit"); //enter 'localhost:x/exit' to terminate program
 
@@ -245,6 +241,11 @@ int MainServer::start() {
     return 0;
 }
 
+/**
+ * Parses get request from browser to find command sent in by user
+ * @param req request from browser
+ * @return a string containing the user command
+ */
 string MainServer::parseGetReq(string req){ //TODO make req const -Clang(?)
     string firstLineEnd = " HTTP/1.1\r\n";
     int firstLineEndPos = req.find(firstLineEnd);
@@ -253,6 +254,14 @@ string MainServer::parseGetReq(string req){ //TODO make req const -Clang(?)
     return command;
 }
 
+/**
+ * deprecated
+ * Lets user choose a number in a range for how many Nodes they want to use.
+ *
+ * @param min minimum amount of Nodes
+ * @param max maximum amount of Nodes
+ * @return amount of Nodes the user wants
+ */
 int MainServer::getNodeAmount(int min, int max){
     int nodeAmountPlaceholder;
     cout << "Enter how many nodes you want to use, minimum " << min << " and maximum " << max << endl;
@@ -264,9 +273,14 @@ int MainServer::getNodeAmount(int min, int max){
     return nodeAmountPlaceholder;
 }
 
+/**
+ * HTTP response greeting the user.
+ *
+ * @return a string containing the HTTP greeting
+ */
 string MainServer::welcome(){
     string body =
-            "<h1>Welcome to the Shrouter</h1>\r\n"
+            "<h1>Welcome to the Simple router</h1>\r\n"
             "<p>This is a prototype implementation of an onion router</p>\r\n"
             "<p>To navigate to the help page, enter '<a href=\"http://localhost:777/help\">localhost:777/help</a>' in the address bar</p>"; //TODO refactor the portnr if it changes
     string welcome = "HTTP/1.1 200 OK\r\n"
@@ -277,6 +291,10 @@ string MainServer::welcome(){
     return welcome;
 }
 
+/**
+ * HTTP used to give simple info to user.
+ * @return
+ */
 string MainServer::help(){
     string body =
             "<h1>Help</h1>\r\n"
@@ -299,8 +317,30 @@ string MainServer::help(){
     return help;
 }
 
-string MainServer::notFound(){
-    string notFound = "HTTP/1.0 404 Not Found\r\n"
-                      "Connection: Close\r\n\r\n";
+/**
+ * HTTP used if a command is not found.
+ * @param command the command that is not found
+ * @return
+ */
+string MainServer::notFound(string command){
+    string body =
+            "<h1>404 Not Found</h1>"
+            "<p>No support for command '" + command + "'</p>";
+    string notFound = "HTTP/1.1 404 Not Found\r\n"
+                      "Content-Type: text/html\r\n"
+                      "Content-Length: " + to_string(body.length()) + "\r\n"
+                      "Connection: Close\r\n\r\n"
+                      +body;
     return notFound;
+}
+
+/**
+ * Gets localhost IP from the user
+ * @return
+ */
+string MainServer::getLocalhostIpFromUser(){
+    string localhostIP;
+    cout << "Please enter the IP address of your localhost: ";
+    cin >> localhostIP;
+    return localhostIP;
 }
