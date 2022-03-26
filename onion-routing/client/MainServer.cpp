@@ -12,7 +12,6 @@
 #include "../security/string-modifier/StringModifier.h"
 #include "../security/aes/Crypter.h"
 
-#define localhost "192.168.10.100"
 bool MainServer::generateKeys(){
     for(auto it = begin(userNodes); it != end(userNodes)-1; it++){
         long long int num = StringModifier::BN2LLI(Handshake::doHandshake(it->decryptKey, std::next(it)->encryptKey));
@@ -86,8 +85,9 @@ string MainServer::receiveMessage(Cryption &c){
 int MainServer::start() {
     //create nodePool with x Nodes and give them their
     //nodeAmount = getNodeAmount(3, 12);
+    const char* localhost = getLocalhostIpFromUser().c_str();
     nodeAmount = 3;
-    initNodes();
+    initNodes(localhost);
     //ask for nodeAmount, at least 3
     generateKeys();
     //pick nodeAmount Nodes from pool
@@ -157,7 +157,7 @@ int MainServer::start() {
                 std::thread t2(&Node::initialize_server_socket, &userNodes[1], "8087", "8080", localhost);
                 std::thread t3(&ExitNode::initialize_server_socket, &userExitNode, "8080");
 
-                SOCKET connectSocket = SocketGetters::getConnectSocket("192.168.10.100", "8081");
+                SOCKET connectSocket = SocketGetters::getConnectSocket(localhost, "8081");
 
                 userRequest = sendMessage(userRequest);
                 cout << "Sent from mainServer: " << userRequest << endl;
@@ -353,11 +353,11 @@ string MainServer::notFound(){
     return notFound;
 }
 
-void MainServer::initNodes(){
-    userInputNode = InputNode("8081", "8087", "192.168.10.100");
+void MainServer::initNodes(const char* ip){
+    userInputNode = InputNode("8081", "8087", ip);
     userNodes.push_back(userInputNode);
     for(int i = 0; i < nodeAmount-2; i++){
-        userNodes.push_back(Node("8087", "8080", "192.168.10.100"));
+        userNodes.push_back(Node("8087", "8080", ip));
     }
     userExitNode =  ExitNode("8080", "0" ,"0");
     userNodes.push_back(userExitNode);
@@ -387,3 +387,13 @@ vector<int> MainServer::split(string s){
     return info;
 }
 
+/**
+ * Gets localhost IP from the user
+ * @return
+ */
+string MainServer::getLocalhostIpFromUser(){
+    string localhostIP;
+    cout << "Please enter the IP address of your localhost: ";
+    cin >> localhostIP;
+    return localhostIP;
+}

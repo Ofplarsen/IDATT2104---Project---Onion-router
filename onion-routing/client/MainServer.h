@@ -29,7 +29,7 @@ private:
     SOCKET forward; //Used to forward information to Nodes
 
     int nodeAmount; //Amount of nodes
-    void initNodes();
+    void initNodes(const char *string1);
 public:
     vector<long long int> keys;
     const vector<Node> &getUserNodes() const;
@@ -52,6 +52,7 @@ public:
 
     static vector<int> split(string s);
 
+    static string getLocalhostIpFromUser();
 };
 
 
