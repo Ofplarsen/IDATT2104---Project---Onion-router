@@ -12,7 +12,7 @@
 #include "../security/string-modifier/StringModifier.h"
 #include "../security/aes/Crypter.h"
 
-#define localhost "192.168.10.100"
+#define localhost "192.168.1.14"
 bool MainServer::generateKeys(){
     for(auto it = begin(userNodes); it != end(userNodes)-1; it++){
         long long int num = StringModifier::BN2LLI(Handshake::doHandshake(it->decryptKey, std::next(it)->encryptKey));
@@ -126,7 +126,6 @@ int MainServer::start() {
             end = userRequest.find("\r\n\r\n");
             if(end == string::npos) continue; //If we don't have the entire get request, continue to next iteration and get more of it
             userCommand = parseGetReq(userRequest);
-            //cout<<userRequest<<endl;
             cout<<userCommand<<endl;
             if(userCommand == "INVALID") {
                 cout << "An invalid request was sent to the server" << endl;
@@ -156,7 +155,7 @@ int MainServer::start() {
                 std::thread t2(&Node::initialize_server_socket, &userNodes[1], "8087", "8080", localhost);
                 std::thread t3(&ExitNode::initialize_server_socket, &userExitNode, "8080");
 
-                SOCKET connectSocket = SocketGetters::getConnectSocket("192.168.10.100", "8081");
+                SOCKET connectSocket = SocketGetters::getConnectSocket(localhost, "8081");
 
                 userRequest = sendMessage(userRequest);
                 cout << "Sent from mainServer: " << userRequest << endl;
@@ -329,7 +328,7 @@ int MainServer::getNodeAmount(int min, int max){
  */
 string MainServer::welcome(){
     string body =
-            "<h1>Welcome to the Shrouter</h1>\r\n"
+            "<h1>Welcome to the Simple router</h1>\r\n"
             "<p>This is a prototype implementation of an onion router</p>\r\n"
             "<p>To navigate to the help page, enter '<a href=\"http://localhost:777/help\">localhost:777/help</a>' in the address bar</p>"; //TODO refactor the portnr if it changes
     string welcome = "HTTP/1.1 200 OK\r\n"
