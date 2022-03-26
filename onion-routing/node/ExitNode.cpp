@@ -3,10 +3,14 @@
 //
 
 #include <winsock2.h>
-#include <ws2tcpip.h>
 #include "ExitNode.h"
 #include "../security/string-modifier/StringModifier.h"
 
+/**
+ * Parses get request sent from browser to InputNode and extracts domain name and path, which is put in a vector.
+ * @param req get request from browser
+ * @return a vector containing the domain name at index 0 and path at index 1
+ */
 vector<string> ExitNode::parseInitialReq(string req) {
     int user_arg_end;
     bool contains_path = false;
@@ -25,15 +29,27 @@ vector<string> ExitNode::parseInitialReq(string req) {
     return domain_and_path;
 }
 
+/**
+ * Constructs a basic get request given a domain name and path.
+ * @param domain_name name of the website that the get request should be sent to
+ * @param path path for request, if any
+ * @return a string containing a get request for some URL
+ */
 string ExitNode::constructGetReq(string domain_name, string path) { //Constructs a modified GET request where the first line is the length of the domain and path separated by |
     string get_req = "GET /" + path + " HTTP/1.1\r\nHost: " + domain_name +
                      "\r\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0\r\nConnection: close\r\n\r\n";
     return get_req;
 }
 
+/**
+ * Initializes an ExitNode which listens on a given port. The data received from previous Nodes is used to figure out
+ * which website ExitNode should redirect the data to, and sends it to the given HTTP website. The response is then sent
+ * bak to the previous Nodes.
+ * @param listenPort port used to listen for connections
+ */
 void ExitNode::initialize_server_socket(const char *listenPort) {
 
-    SOCKET ListenSocket = getListenSocket(listenPort); //Making a socket listen on given port
+    SOCKET ListenSocket = SocketGetters::getListenSocket(listenPort); //Making a socket listen on given port
 
     SOCKET ClientSocket = INVALID_SOCKET;
 
@@ -70,12 +86,7 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
         } while(iStart == 512); //TODO this might not be very secure. What if user sends some data in smaller packages than 512? Or exactly 512 x times? That will break the program, recv blocks for ever.
         cout << "\nAs whole string: \n" << initial_user_req << endl;
         iResult = iStart;
-        //cout << initial_user_req << endl;
-        //Looking for domain name and path in user request from browser. Test webpage input www.softwareqatest.com/qatfaq2.html
-//        vector<string> parsed = parse_initial_request(initial_user_req); //Contains domain_name and path
-//
-//        //constructing a get request that the node will send to socket on internet
-//        string getReq = construct_get_request(parsed.at(0), parsed.at(1));
+
         end = initial_user_req.find("\r\n");
         if(end != string::npos){
             info = initial_user_req.substr(0, end);
@@ -99,20 +110,6 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
 
         //TODO MEM?
 
-//        cout<< initial_user_req<< endl;
-//        Cryption cre = StringModifier::splitString(initial_user_req);
-//        cout << "cre succ" << endl;
-//        cre.strings_len = StringModifier::getVector(sizes[0],sizes[1],sizes[2]);
-//        cout << cre.strings_len.size() << endl;
-//        cout << cre.res.size()<< endl;
-
-//        cout << "string len suc" << endl;
-//        string decrypted = decrypt(cre);
-//        cout<<decrypted<<endl;
-//        string returnVal = info+"\r\n" += decrypted;
-//        cout << returnVal << endl;
-
-
         //getting IP address from domain sent in by user
         hostent *webDomain = gethostbyname(domain.c_str());
         in_addr *addr; //To get  char  version of ip: inet_ntoa(*addr)
@@ -128,7 +125,7 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
         if (iResult > 0) {
             printf("Bytes received: %d\n", iResult);
 
-            SOCKET web_page_socket = getConnectSocket(inet_ntoa(*addr), "80"); //HTTP listens on port 80
+            SOCKET web_page_socket = SocketGetters::getConnectSocket(inet_ntoa(*addr), "80"); //HTTP listens on port 80
             iSendResult = send(web_page_socket, getReq.c_str(), getReq.length(), 0); //forwarding received message to next/server
             if (iSendResult == SOCKET_ERROR) {
                 printf("HAPPENED IN EXITNODE PLACE 1");
@@ -212,125 +209,17 @@ void ExitNode::initialize_server_socket(const char *listenPort) {
     WSACleanup();
 }
 
-
-SOCKET ExitNode::getConnectSocket(const char *ip, const char *port) {
-    WSADATA wsaData;
-    int iResult;
-
-    // Initialize Winsock
-    iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (iResult != 0) {
-        printf("WSAStartup failed: %d\n", iResult);
-        return NULL;
-    }
-
-    struct addrinfo *result = NULL,
-            *ptr = NULL,
-            hints;
-
-    ZeroMemory( &hints, sizeof(hints) );
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-
-#define DEFAULT_TLS_PORT = "433"
-
-    // Resolve the server address and port
-    iResult = getaddrinfo(ip, port, &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed: %d\n", iResult);
-        WSACleanup();
-        return NULL;
-    }
-
-    SOCKET ConnectSocket = INVALID_SOCKET;
-
-    // Attempt to connect to the first address returned by
-    // the call to getaddrinfo
-    ptr=result;
-
-    // Create a SOCKET for connecting to server
-    ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype,
-                           ptr->ai_protocol);
-
-    if (ConnectSocket == INVALID_SOCKET) {
-        printf("Error at socket(): %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return NULL;
-    }
-
-    // Connect to server.
-    iResult = ::connect( ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        closesocket(ConnectSocket);
-        ConnectSocket = INVALID_SOCKET;
-    }
-
-    return ConnectSocket;
-}
-
-SOCKET ExitNode::getListenSocket(const char *port_nr) {
-    WSAData wsaData;
-    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-    std::cout << "Initializing winosck..." << std::endl;
-    if (iResult != 0) {
-        std::cout << "Something went wrong " << WSAGetLastError() << std::endl;
-        return NULL;
-    }
-
-    struct addrinfo *result = NULL, *ptr = NULL, hints;
-
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = AI_PASSIVE;
-
-    // Resolve the local address and port to be used by the server
-    iResult = getaddrinfo(NULL, port_nr, &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed: %d\n", iResult);
-        WSACleanup();
-        return NULL;
-    }
-
-    SOCKET ListenSocket = INVALID_SOCKET;
-
-    // Create a SOCKET for the server to listen for client connections
-    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (ListenSocket == INVALID_SOCKET) {
-        printf("Error at socket(): %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return NULL;
-    }
-
-    // Setup the TCP listening socket
-    iResult = bind(ListenSocket, result->ai_addr, (int) result->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        printf("bind failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(result);
-        closesocket(ListenSocket);
-        WSACleanup();
-        return NULL;
-    }
-
-    freeaddrinfo(result);
-
-    if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR ) {
-        printf( "Listen failed with error: %ld\n", WSAGetLastError() );
-        closesocket(ListenSocket);
-        WSACleanup();
-        return NULL;
-    }
-
-    return ListenSocket;
-}
-
+/**
+ * Basic constructor
+ */
 ExitNode::ExitNode() {}
 
+/**
+ * Constructor for setting parameters needed by ExitNode
+ * @param listenPort listens at this port
+ * @param connectPort connects to this port
+ * @param connectIp connects to this IP
+ */
 ExitNode::ExitNode(const char *listenPort, const char *connectPort, const char *connectIp) : Node(listenPort,
                                                                                                   connectPort,
                                                                                                   connectIp) {}

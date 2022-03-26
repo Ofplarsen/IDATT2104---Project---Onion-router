@@ -12,9 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ws2tcpip.h>
-
-#define PORT 8080
-
 #include "Node.h"
 #include <vector>
 
@@ -25,16 +22,11 @@ private:
 
 public:
     ExitNode();
-
     ExitNode(const char *listenPort, const char *connectPort, const char *connectIp);
-
     explicit ExitNode(const char *listenPort){
         this->listenPort=listenPort;
     }
     void initialize_server_socket(const char *listenPort);
-
-    SOCKET getListenSocket(const char *nr);
-    SOCKET getConnectSocket(const char *ip, const char *port);
 
     vector<string> parseInitialReq(string req);
     string constructGetReq(string domain_name, string path);
